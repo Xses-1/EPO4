@@ -27,7 +27,7 @@ class KITT:
         self.serial.close()
         
 if __name__ == '__main__':
-    kitt = KITT(4)
-
-    print(kitt.sitrep())
+    kitt = KITT()
+    string = str(kitt.sitrep())
+    print(string.split('\n'))
     
