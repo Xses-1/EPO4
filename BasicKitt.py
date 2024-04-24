@@ -2,6 +2,9 @@
 import serial
 import keyboard
 
+comPort = '/dev/rfcomm0'
+joystickFile = '/dev/uinput'
+
 class KITT:
     def __init__(self, port, baudrate=115200):
         self.serial = None
@@ -64,34 +67,9 @@ def Updatekeys():
     else:
         keysPressed[3] = 0
 
-def tick():
-    print('tick')
-
-    Updatekeys()
-
     match keysPressed:
         ## stop case
         case [0,0,0,0]:
-            kitt.stop()
-        
-        ## A and D pressed
-        case [0,1,0,1]:
-            kitt.stop()
-        case [1,1,0,1]:
-            kitt.stop()
-        case [0,1,1,1]:
-            kitt.stop()
-
-        ## W and S pressed
-        case [1,0,1,0]:
-            kitt.stop()
-        case [1,1,1,0]:
-            kitt.stop()
-        case [1,0,1,1]:
-            kitt.stop()
-
-        ## both
-        case [1,1,1,1]: 
             kitt.stop()
 
         ## right, no speed
@@ -136,9 +114,35 @@ def tick():
               
         case _:
             kitt.stop()
+
+                                        ## TODO 
+def updateStick():
+    
+    #with open(joystickFile, 'r') as joystick:
+    #    data = joystick.read()
+    ## +- 32767
+    xVal = 000 ## This is a test value
+    yVal = 000
+
+    x_pwm = 100/65534 * (xVal - 32747) + 100
+    y_pwm = 100/65534 * (yVal - 32747) + 100
+
+
+def updateInput(WhichInput):
+    if WhichInput == 0:
+        Updatekeys()
+    if WhichInput == 1:
+        updateStick()
+
+
+def tick():
+    updateInput(WhichInput)
+
+    
         
         
 if __name__ == '__main__':
+    WhichInput = input('which input device would you like to use [keyboard = 0, Joystick = 1]: ')
     kitt = KITT('/dev/rfcomm0')
     string = str(kitt.sitrep())
     print(string)
