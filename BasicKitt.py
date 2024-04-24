@@ -25,9 +25,12 @@ class KITT:
 
     def __del__(self):
         self.serial.close()
+
+def tick():
+    keysPressed = [0,0,0,0]
         
 if __name__ == '__main__':
-    kitt = KITT()
+    kitt = KITT('/dev/rfcomm0')
     string = str(kitt.sitrep())
     print(string.split('\n'))
     
