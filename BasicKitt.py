@@ -1,3 +1,4 @@
+#!/bin/python3.10
 import serial
 
 class KITT:
@@ -26,11 +27,15 @@ class KITT:
     def __del__(self):
         self.serial.close()
 
+keysPressed = [0,0,0,0]
+
 def tick():
-    keysPressed = [0,0,0,0]
+    print('tick')
+    
         
 if __name__ == '__main__':
     kitt = KITT('/dev/rfcomm0')
     string = str(kitt.sitrep())
-    print(string.split('\n'))
+    print(string.split('\\n'))
+    kitt.serial.close()
     
