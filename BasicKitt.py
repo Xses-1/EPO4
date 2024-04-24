@@ -4,7 +4,10 @@ import keyboard
 
 class KITT:
     def __init__(self, port, baudrate=115200):
-        self.serial = serial.Serial(port, baudrate, rtscts=True)
+        self.serial = None
+        while self.serial == None:
+            self.serial = serial.Serial(port, baudrate, rtscts=True)
+            
         # state variables such as speed, angle are defined here
 
     def send_command(self, command):
@@ -41,22 +44,22 @@ class KITT:
 keysPressed = [0,0,0,0]
 
 def Updatekeys():
-    if keyboard.is_pressed('W'):
+    if keyboard.is_pressed('w'):
         keysPressed[0] = 1
     else:
         keysPressed[0] = 0
 
-    if keyboard.is_pressed('A'):
+    if keyboard.is_pressed('a'):
         keysPressed[1] = 1
     else:
         keysPressed[1] = 0
 
-    if keyboard.is_pressed('S'):
+    if keyboard.is_pressed('s'):
         keysPressed[2] = 1
     else:
         keysPressed[2] = 0
 
-    if keyboard.is_pressed('D'):
+    if keyboard.is_pressed('d'):
         keysPressed[3] = 1
     else:
         keysPressed[3] = 0
