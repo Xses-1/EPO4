@@ -1,5 +1,6 @@
 #!/bin/python3.10
 import serial
+import keyboard
 
 class KITT:
     def __init__(self, port, baudrate=115200):
@@ -19,6 +20,16 @@ class KITT:
         self.set_speed(150)
         self.set_angle(150)
 
+    def setBeacon(self, carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xDEADBEEF):
+        carrier_freq = carrier_freq.to_bytes(2, byteorder= 'big')
+        self.serial.write('F' + carrier_freq + b'\n')
+        bit_frequency = bit_frequency.to_bytes(2, byteorder= 'big')
+        self.serial.write('B' + bit_frequency + b'\n')
+        repition_count = repition_count.to_bytes(2, byteorder= 'big')
+        self.serial.write('R' + repition_count + b'\n')
+        code = code.to_bytes(4, byteorder= 'big')
+        self.serial.write('C' + code + b'\n')
+
     def sitrep(self):
         self.serial.write(b'S\n')
         status = self.serial.read_until(b'\x04')
@@ -29,13 +40,109 @@ class KITT:
 
 keysPressed = [0,0,0,0]
 
+def Updatekeys():
+    if keyboard.is_pressed('W'):
+        keysPressed[0] = 1
+    else:
+        keysPressed[0] = 0
+
+    if keyboard.is_pressed('A'):
+        keysPressed[1] = 1
+    else:
+        keysPressed[1] = 0
+
+    if keyboard.is_pressed('S'):
+        keysPressed[2] = 1
+    else:
+        keysPressed[2] = 0
+
+    if keyboard.is_pressed('D'):
+        keysPressed[3] = 1
+    else:
+        keysPressed[3] = 0
+
 def tick():
     print('tick')
-    
+
+    Updatekeys()
+
+    match keysPressed:
+        ## stop case
+        case [0,0,0,0]:
+            kitt.stop()
+        
+        ## A and D pressed
+        case [0,1,0,1]:
+            kitt.stop()
+        case [1,1,0,1]:
+            kitt.stop()
+        case [0,1,1,1]:
+            kitt.stop()
+
+        ## W and S pressed
+        case [1,0,1,0]:
+            kitt.stop()
+        case [1,1,1,0]:
+            kitt.stop()
+        case [1,0,1,1]:
+            kitt.stop()
+
+        ## both
+        case [1,1,1,1]: 
+            kitt.stop()
+
+        ## right, no speed
+        case [0,0,0,1]:
+            kitt.set_angle(100)
+            kitt.set_speed(150)
+        
+        ## straight, backwards
+        case [0,0,1,0]:
+            kitt.set_angle(150)
+            kitt.set_speed(140)
+        
+        ## right, backwards
+        case [0,0,1,1]:
+            kitt.set_angle(100)
+            kitt.set_speed(140)
+
+        ## left, no speed
+        case [0,1,0,0]:
+            kitt.set_angle(200)
+            kitt.set_speed(150)
+        
+        ## left, backwards
+        case [0,1,1,0]:
+            kitt.set_angle(200)
+            kitt.set_speed(140)
+        
+        ## straight, forward
+        case [1,0,0,0]:
+            kitt.set_angle(150)
+            kitt.set_speed(160)
+
+        ## straight, right
+        case [1,0,0,1]:
+            kitt.set_angle(100)
+            kitt.set_speed(160)
+        
+        ## straight, left
+        case [1,1,0,0]:
+            kitt.set_angle(200)
+            kitt.set_speed(160)
+              
+        case _:
+            kitt.stop()
+        
         
 if __name__ == '__main__':
     kitt = KITT('/dev/rfcomm0')
     string = str(kitt.sitrep())
-    print(string.split('\\n'))
+    print(string)
+    while True:
+        try:
+            tick()
+        except KeyboardInterrupt:
+            break
     kitt.serial.close()
     
