@@ -22,6 +22,19 @@ class KITT:
         self.serial.write(b'S\n')
         status = self.serial.read_until(b'\x04')
         return status
+    
+    def print_status(self):
+        string = self.sitrep()
+        i = 0
+        while i < len(string):
+            if string[i] == "\\" and string [i+1] == "n":
+                print()
+                i = i + 1
+
+            else:
+                print(string[i], end='')
+
+            i = i + 1
 
     def __del__(self):
         self.serial.close()
@@ -29,19 +42,7 @@ class KITT:
         
 if __name__ == '__main__':
     kitt = KITT('/dev/rfcomm0')
-    string = str(kitt.sitrep())
-    #print(string.split('\n'))
-    
-    i = 0;
-    while i < len(string):
-        if string[i] == "\\" and string [i+1] == "n":
-            print()
-            i = i + 1
-            
-        else:
-            print(string[i], end='')
-
-        i = i + 1
+    kitt.print_status()
 
     
     kitt.serial.close()
