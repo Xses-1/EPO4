@@ -199,7 +199,7 @@ def alt_c():
 WhichInput = 0
 
 if __name__ == '__main__':
-    #keyboard.add_hotkey('alt+c', alt_c)
+    keyboard.add_hotkey('alt+c', alt_c)
     
 
     try:
