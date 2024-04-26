@@ -3,7 +3,7 @@ import serial
 import keyboard
 import sys
 
-comPort = '/dev/rfcomm0'
+comPort = 'COM7'
 joystickFile = '/dev/uinput'
 
 class KITT:
