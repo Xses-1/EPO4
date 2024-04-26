@@ -38,11 +38,11 @@ class KITT:
 
     def setBeacon(self, carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xDEADBEEF):
         carrier_freq = carrier_freq.to_bytes(2, byteorder= 'big')
-        self.send_command(f'F{carrier_freq}\n')
+        self.serial.write( b'F' + carrier_freq + b'\n')
         bit_frequency = bit_frequency.to_bytes(2, byteorder= 'big')
-        self.send_command(f'B{bit_frequency}\n')
+        self.serial.write(b'B' + bit_frequency + b'\n')
         repition_count = repition_count.to_bytes(2, byteorder= 'big')
-        self.send_command(f'R{repition_count}\n')
+        self.serial.write(b'R' + repition_count + b'\n')
         code = code.to_bytes(4, byteorder= 'big')
         self.serial.write(b'C' + code + b'\n')
 
@@ -96,22 +96,22 @@ def Updatekeys():
     if keyboard.is_pressed('x') or kitt.EstopF == True:
         kitt.Estop()
 
-    if keyboard.is_pressed('w'):
+    if keyboard.is_pressed('up'):
         WASD[0] = 1
     else:
         WASD[0] = 0
 
-    if keyboard.is_pressed('a'):
+    if keyboard.is_pressed('left'):
         WASD[1] = 1
     else:
         WASD[1] = 0
 
-    if keyboard.is_pressed('s'):
+    if keyboard.is_pressed('down'):
         WASD[2] = 1
     else:
         WASD[2] = 0
 
-    if keyboard.is_pressed('d'):
+    if keyboard.is_pressed('right'):
         WASD[3] = 1
     else:
         WASD[3] = 0
@@ -140,7 +140,7 @@ def Updatekeys():
         ## straight, backwards
         case [0,0,1,0]:
             kitt.set_angle(150)
-            kitt.set_speed(140)
+            kitt.set_speed(135)
         
         ## right, backwards
         case [0,0,1,1]:
@@ -160,7 +160,7 @@ def Updatekeys():
         ## straight, forward
         case [1,0,0,0]:
             kitt.set_angle(150)
-            kitt.set_speed(160)
+            kitt.set_speed(165)
 
         ## straight, right
         case [1,0,0,1]:
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     
     kitt.print_status()
 
-    kitt.setBeacon(carrier_freq = 1000, bit_frequency = 500, repition_count = 2500, code = 0xB00B1E50)
+    kitt.setBeacon(carrier_freq = 1000, bit_frequency = 50, repition_count = 2500, code = 0xB00B1E50)
 
     while True:
         try:
