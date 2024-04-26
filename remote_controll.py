@@ -4,7 +4,7 @@ import keyboard
 import sys
 import time
 
-comPort ='COM7' #COM7 /dev/rfcomm0
+comPort = '/dev/rfcomm0'
 joystickFile = '/dev/uinput'
 
 class KITT:
