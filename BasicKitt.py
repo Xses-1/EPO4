@@ -1,3 +1,4 @@
+#!/bin/python3.10
 import serial
 
 class KITT:
@@ -24,7 +25,7 @@ class KITT:
         return status
     
     def print_status(self):
-        string = self.sitrep()
+        string = str(self.sitrep())
         i = 0
         while i < len(string):
             if string[i] == "\\" and string [i+1] == "n":
@@ -35,6 +36,8 @@ class KITT:
                 print(string[i], end='')
 
             i = i + 1
+
+        print()
 
     def __del__(self):
         self.serial.close()
