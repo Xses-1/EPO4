@@ -4,7 +4,7 @@ import keyboard
 import sys
 import time
 
-comPort = '/dev/rfcomm0'
+comPort ='COM7' #COM7 /dev/rfcomm0
 joystickFile = '/dev/uinput'
 
 class KITT:
@@ -43,18 +43,18 @@ class KITT:
         repition_count = repition_count.to_bytes(2, byteorder= 'big')
         self.send_command(f'R{repition_count}\n')
         code = code.to_bytes(4, byteorder= 'big')
-        self.send_command(f'C{code}\n')
+        self.serial.write(b'C' + code + b'\n')
 
     def startBeacon(self):
         if self.BeaconFlag == True:
             return
         else:    
-            self.send_command('A1\n')
+            self.serial.write(b'A1\n')
             self.BeaconFlag = True
     
     def stopBeacon(self):
         if self.BeaconFlag == True:
-            self.send_command('A0\n')
+            self.serial.write(b'A0\n')
             self.BeaconFlag = False
             print('beacon stopped')
         else:    
@@ -80,6 +80,7 @@ class KITT:
 
     def Estop(self):
         self.set_speed(135)
+        time.sleep(0.1)
         self.stop()
         self.EstopF = True
 
