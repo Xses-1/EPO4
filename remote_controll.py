@@ -33,13 +33,13 @@ class KITT:
 
     def setBeacon(self, carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xDEADBEEF):
         carrier_freq = carrier_freq.to_bytes(2, byteorder= 'big')
-        self.serial.write('F' + carrier_freq + b'\n')
+        self.send_command(f'F{carrier_freq}\n')
         bit_frequency = bit_frequency.to_bytes(2, byteorder= 'big')
-        self.serial.write('B' + bit_frequency + b'\n')
+        self.send_command(f'B{bit_frequency}\n')
         repition_count = repition_count.to_bytes(2, byteorder= 'big')
-        self.serial.write('R' + repition_count + b'\n')
+        self.send_command(f'R{repition_count}\n')
         code = code.to_bytes(4, byteorder= 'big')
-        self.serial.write('C' + code + b'\n')
+        self.send_command(f'C{code}\n')
 
     def startBeacon(self):
         if self.BeaconFlag:
@@ -61,7 +61,7 @@ class KITT:
         return status
     
     def print_status(self):
-        string = self.sitrep()
+        string = str(self.sitrep())
         i = 0
         while i < len(string):
             if string[i] == "\\" and string [i+1] == "n":
