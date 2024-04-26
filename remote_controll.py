@@ -2,17 +2,21 @@
 import serial
 import keyboard
 import sys
+import time
 
-comPort = 'COM7'
+comPort = '/dev/rfcomm0'
 joystickFile = '/dev/uinput'
 
 class KITT:
     def __init__(self, port, baudrate=115200):
         self.serial = None
-        self.Estop = False
+        self.EstopF = False
         self.BeaconFlag = False
         for i in range(3):
-            self.serial = serial.Serial(port, baudrate, rtscts=True)
+            try:
+                self.serial = serial.Serial(port, baudrate, rtscts=True)
+            except serial.serialutil.SerialException:
+                print(i)
         if self.serial == None:
             raise Exception
             
@@ -42,16 +46,17 @@ class KITT:
         self.send_command(f'C{code}\n')
 
     def startBeacon(self):
-        if self.BeaconFlag:
+        if self.BeaconFlag == True:
             return
         else:    
-            self.serial.write(b'A1\n')
+            self.send_command('A1\n')
             self.BeaconFlag = True
     
     def stopBeacon(self):
-        if self.BeaconFlag:
-            self.serial.write(b'A0\n')
+        if self.BeaconFlag == True:
+            self.send_command('A0\n')
             self.BeaconFlag = False
+            print('beacon stopped')
         else:    
             return
 
@@ -76,7 +81,7 @@ class KITT:
     def Estop(self):
         self.set_speed(135)
         self.stop()
-        self.Estop = True
+        self.EstopF = True
 
     def __del__(self):
         self.serial.close()
@@ -84,11 +89,9 @@ class KITT:
 
 def Updatekeys():
                 #[W,A,S,D,E,Q,X]
-    WASD = [0,0,0,0,0,0,0]
-
-    if keyboard.is_pressed('x') or kitt.Estop == True:
+    WASD = [0,0,0,0]
+    if keyboard.is_pressed('x') or kitt.EstopF == True:
         kitt.Estop()
-        
 
     if keyboard.is_pressed('w'):
         WASD[0] = 1
@@ -111,9 +114,11 @@ def Updatekeys():
         WASD[3] = 0
 
     if keyboard.is_pressed('e'):
+        print('startBeacon')
         kitt.startBeacon()
 
     if keyboard.is_pressed('q'):
+        print('stopBeacon')
         kitt.stopBeacon()
 
     match WASD:
@@ -178,10 +183,10 @@ def updateStick():
 
 
 def updateInput(WhichInput):
-    if WhichInput == 0:
-        Updatekeys()
-    if WhichInput == 1:
+    if WhichInput:
         updateStick()
+    else:
+        Updatekeys()
 
 
 def tick():
@@ -190,31 +195,30 @@ def tick():
 def alt_c():
     global WhichInput
     WhichInput = not WhichInput
-    if WhichInput == 0:
-        print('keyboard Selected')
+    if WhichInput:
+        print('joystick Selected')        
     else:
-        print('joystick Selected')
+        print('keyboard Selected')
+        
 
 
-WhichInput = 0
+WhichInput = False
 
 if __name__ == '__main__':
     keyboard.add_hotkey('alt+c', alt_c)
     
 
-    try:
-        kitt = KITT('/dev/rfcomm0')
-    except Exception:
-        sys.exit(-1)
-
+    
+    kitt = KITT(comPort)
+    
     kitt.print_status()
 
-    kitt.setBeacon(carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xB00B1E50)
+    kitt.setBeacon(carrier_freq = 1000, bit_frequency = 500, repition_count = 2500, code = 0xB00B1E50)
 
     while True:
         try:
             tick()
-            print()
+            time.sleep(0.1)
         except KeyboardInterrupt:
             break
 
