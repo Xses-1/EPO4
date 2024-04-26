@@ -78,11 +78,10 @@ class KITT:
 
             i = i + 1
         
-        os.system('clear')
 
     def Estop(self):
         self.set_speed(135)
-        time.sleep(0.1)
+        time.sleep(0.5)
         self.stop()
         self.EstopF = True
 
@@ -93,7 +92,9 @@ class KITT:
 def Updatekeys():
                 #[W,A,S,D,E,Q,X]
     WASD = [0,0,0,0]
-    if keyboard.is_pressed('x') or kitt.EstopF == True:
+    if  kitt.EstopF == True:
+        return
+    elif keyboard.is_pressed('x'):
         kitt.Estop()
 
     if keyboard.is_pressed('w'):
@@ -224,6 +225,8 @@ if __name__ == '__main__':
     while True:
         try:
             tick()
+            os.system('clear')
+            kitt.print_status()
             time.sleep(0.1)
         except KeyboardInterrupt:
             break
