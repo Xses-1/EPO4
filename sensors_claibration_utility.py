@@ -22,7 +22,7 @@ class KITT:
         self.set_angle(150)
 
     def sitrep(self):
-        self.serial.write(b'S\n')
+        self.serial.write(b'Sd\n')
         status = self.serial.read_until(b'\x04')
         return status
     
