@@ -204,8 +204,7 @@ if __name__ == '__main__':
     except Exception:
         sys.exit(-1)
 
-    string = str(kitt.sitrep())
-    print(string)
+    kitt.print_status()
 
     kitt.setBeacon(carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xB00B1E50)
 
