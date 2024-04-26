@@ -188,16 +188,19 @@ def tick():
     updateInput(WhichInput)
 
 def alt_c():
+    global WhichInput
     WhichInput = not WhichInput
     if WhichInput == 0:
         print('keyboard Selected')
     else:
         print('joystick Selected')
 
-    
+
+WhichInput = 0
+
 if __name__ == '__main__':
-    keyboard.add_hotkey('alt+c', alt_c)
-    WhichInput = 0
+    #keyboard.add_hotkey('alt+c', alt_c)
+    
 
     try:
         kitt = KITT('/dev/rfcomm0')
@@ -211,7 +214,10 @@ if __name__ == '__main__':
     while True:
         try:
             tick()
+            print()
         except KeyboardInterrupt:
             break
+
+
     kitt.serial.close()
     
