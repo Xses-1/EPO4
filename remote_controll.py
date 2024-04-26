@@ -2,6 +2,7 @@
 import serial
 import keyboard
 import sys
+import os
 import time
 
 comPort = '/dev/rfcomm0'
@@ -56,7 +57,6 @@ class KITT:
         if self.BeaconFlag == True:
             self.serial.write(b'A0\n')
             self.BeaconFlag = False
-            print('beacon stopped')
         else:    
             return
 
@@ -77,6 +77,8 @@ class KITT:
                 print(string[i], end='')
 
             i = i + 1
+        
+        os.system('clear')
 
     def Estop(self):
         self.set_speed(135)
@@ -121,6 +123,9 @@ def Updatekeys():
     if keyboard.is_pressed('q'):
         print('stopBeacon')
         kitt.stopBeacon()
+
+    if keyboard.is_pressed('p'):
+        kitt.print_status()
 
     match WASD:
         ## stop case
