@@ -2,6 +2,7 @@
 import serial
 import time
 import os
+from KITT
 
 class KITT:
     def __init__(self, port, baudrate=115200):

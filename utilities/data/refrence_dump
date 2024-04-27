@@ -1,0 +1,22 @@
+Format (x == NULL):
+**************************
+* Audio Beacon: on
+* c: 0x00000000
+* f_c: xxxxx
+* f_b: xxxxx
+* c_r: xxx
+**************************
+* PWM:
+* Dir. xxx
+* Mot. xxx
+**************************
+* Sensors:
+* Dist. L xxx R xxx
+* V_batt xx.x V
+7
+**************************
+Format (x == ’d’):
+USL xxx
+USR xxx
+Format (x == ’v’):
+VBATT xx.x V

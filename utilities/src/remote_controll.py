@@ -5,89 +5,11 @@ import sys
 import os
 import time
 
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc')
+from KITT import KITT
+
 comPort = '/dev/rfcomm0'
 joystickFile = '/dev/uinput'
-
-class KITT:
-    def __init__(self, port, baudrate=115200):
-        self.serial = None
-        self.EstopF = False
-        self.BeaconFlag = False
-        for i in range(3):
-            try:
-                self.serial = serial.Serial(port, baudrate, rtscts=True)
-            except serial.serialutil.SerialException:
-                print(i)
-        if self.serial == None:
-            raise Exception
-            
-        # state variables such as speed, angle are defined here
-
-    def send_command(self, command):
-        self.serial.write(command.encode())
-
-    def set_speed(self, speed):
-        self.send_command(f'M{speed}\n')
-
-    def set_angle(self, angle):
-        self.send_command(f'D{angle}\n')
-
-    def stop(self):
-        self.set_speed(150)
-        self.set_angle(150)
-
-    def setBeacon(self, carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xDEADBEEF):
-        carrier_freq = carrier_freq.to_bytes(2, byteorder= 'big')
-        self.serial.write( b'F' + carrier_freq + b'\n')
-        bit_frequency = bit_frequency.to_bytes(2, byteorder= 'big')
-        self.serial.write(b'B' + bit_frequency + b'\n')
-        repition_count = repition_count.to_bytes(2, byteorder= 'big')
-        self.serial.write(b'R' + repition_count + b'\n')
-        code = code.to_bytes(4, byteorder= 'big')
-        self.serial.write(b'C' + code + b'\n')
-
-    def startBeacon(self):
-        if self.BeaconFlag == True:
-            return
-        else:    
-            self.serial.write(b'A1\n')
-            self.BeaconFlag = True
-    
-    def stopBeacon(self):
-        if self.BeaconFlag == True:
-            self.serial.write(b'A0\n')
-            self.BeaconFlag = False
-        else:    
-            return
-
-    def sitrep(self):
-        self.serial.write(b'S\n')
-        status = self.serial.read_until(b'\x04')
-        return status
-    
-    def print_status(self):
-        string = str(self.sitrep())
-        i = 0
-        while i < len(string):
-            if string[i] == "\\" and string [i+1] == "n":
-                print()
-                i = i + 1
-
-            else:
-                print(string[i], end='')
-
-            i = i + 1
-        
-
-    def Estop(self):
-        self.set_speed(135)
-        time.sleep(0.5)
-        self.stop()
-        self.EstopF = True
-
-    def __del__(self):
-        self.serial.close()
-
 
 def Updatekeys():
                 #[W,A,S,D,E,Q,X]
@@ -214,12 +136,7 @@ WhichInput = False
 if __name__ == '__main__':
     keyboard.add_hotkey('alt+c', alt_c)
     
-
-    
     kitt = KITT(comPort)
-    
-    kitt.print_status()
-
     kitt.setBeacon(carrier_freq = 1000, bit_frequency = 50, repition_count = 2500, code = 0xB00B1E50)
 
     while True:
@@ -228,9 +145,9 @@ if __name__ == '__main__':
             os.system('clear')
             kitt.print_status()
             time.sleep(0.1)
+
         except KeyboardInterrupt:
+            kitt.serial.close()
             break
 
-
     kitt.serial.close()
-    
