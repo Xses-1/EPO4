@@ -25,6 +25,20 @@ class KITT:
         self.r = int(0)
         self.batt = float(0)
 
+        self.speed = int(150)
+        self.angle = int(150)
+
+        self.history = []
+
+        n = len(os.listdir('utilities/data'))
+        self.filename = f'utilities/data/report_log{n}.csv'
+
+        with open(self.filename, 'x') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Time', 'Sensor L', 'Sensor R'])
+            
+        
+
         for i in range(5):
             try:
                 self.serial = serial.Serial(port, baudrate, rtscts=True)
@@ -33,6 +47,8 @@ class KITT:
                 print(i)
         if self.serial == None:
             raise Exception
+        
+        self.setBeacon(carrier_freq = 1000, bit_frequency = 50, repition_count = 2500, code = 0xB00B1E50)
             
         # state variables such as speed, angle are defined here
 
@@ -40,9 +56,11 @@ class KITT:
         self.serial.write(command.encode())
 
     def set_speed(self, speed):
+        self.speed = speed
         self.send_command(f'M{speed}\n')
 
     def set_angle(self, angle):
+        self.angle = angle
         self.send_command(f'D{angle}\n')
 
     def stop(self):
@@ -107,39 +125,44 @@ class KITT:
 
             if string[i] == ':' and string[i-1] == 'c' and string[i-2] == ' ':
                 # This has to converted from hex to dec
-                self.c = int(string[i+4:i+11])
+                self.c = string[i+4:i+11]
 
             if string[i] == 'c' and string[i-1] == '_' and string[i-2] == 'f':
-                self.f_c = int(string[i+3:i+7])
+                self.f_c = int((string[i+3:i+9].split('\\'))[0])
 
             if string[i] == 'b' and string[i-1] == '_' and string[i-2] == 'f':
-                self.f_b = int(string[i+3:i+7])
+                self.f_b = int((string[i+3:i+9].split('\\'))[0])
 
             if string[i] == 'r' and string[i-1] == '_' and string[i-2] == 'c':
-                self.c_r = int(string[i+3:i+5])
+                self.c_r = int((string[i+3:i+9].split('\\'))[0])
 
             if string[i] == 'r' and string[i-1] == 'i' and string[i-2] == 'D':
-                self.dir = int(string[i+3:i+5])
+                self.dir = int((string[i+3:i+9].split('\\'))[0])
 
             if string[i] == 't' and string[i-1] == 'o' and string[i-2] == 'M':
-                self.mot = int(string[i+3:i+5])
+                self.mot = int((string[i+3:i+9].split('\\'))[0])
 
             if string[i] == 'L' and string[i-1] == ' ' and string[i-2] == '.':
-                self.l = int(string[i+2:i+4])
+                self.l = int((string[i+3:i+9].split(' '))[0])
 
             if string[i] == ' ' and string[i-1] == 'R' and string[i-2] == ' ':
-                self.r = int(string[i+1:i+3])
+                self.r = int((string[i+3:i+9].split('\\'))[0])
 
             if string[i] == 't' and string[i-1] == 't' and string[i-2] == 'a':
-                self.batt = float(string[i+2:i+5])
+                self.batt = float((string[i+3:i+9].split('\\'))[0])
+
+            i += 1
 
             # For now it only logs the sensors l, r, and a timestamp
             now = datetime.now()
             current_time = now.strftime("%M:%S.%f")[:-3]
-            with open('../data/report_log.csv', 'w', newline='') as csvfile:
+            with open(self.filename, 'a', newline='') as csvfile:
                 writer = csv.writer(csvfile)
-                writer.writerow(['Time', 'Sensor L', 'Sensor R'])
-                writer.writerow([current_time, self.l, self.r])
+                writer.writerow([current_time,'  ' ,self.l, self.r])
+
+        l = [self.l, self.r, self.batt]
+        self.history.append(l)
+        return l
 
     def updateDirectionKeyboard(self):
         speed = 150
@@ -159,7 +182,7 @@ class KITT:
 
         return speed, angle
 
-    def updateDirectionStick(): ## Low level implementation of joysticks TODO
+    def updateDirectionStick(self): ## Low level implementation of joysticks TODO
     
         #with open(joystickFile, 'r') as joystick:
         #    data = joystick.read()
@@ -174,7 +197,8 @@ class KITT:
         return False
 
     def Estop(self):
-        self.set_speed(135)
+        speed = -self.speed + 300
+        self.set_speed(speed)
         time.sleep(0.5)
         self.stop()
         self.EstopF = True
