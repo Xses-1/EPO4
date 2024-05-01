@@ -2,8 +2,9 @@
 import serial
 import time
 import os
+import sys
 
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc')
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
         
 if __name__ == '__main__':

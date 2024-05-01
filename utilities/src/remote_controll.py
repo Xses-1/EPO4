@@ -5,7 +5,7 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc')
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
 
 comPort = '/dev/rfcomm0'
