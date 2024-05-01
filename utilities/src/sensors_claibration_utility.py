@@ -50,9 +50,7 @@ if __name__ == '__main__':
     kitt = KITT('/dev/rfcomm0')
     while(1):
         kitt.print_status()
-        time.sleep(1)
+        time.sleep(0.008)
         os.system('clear')
 
-
-    
     kitt.serial.close()
