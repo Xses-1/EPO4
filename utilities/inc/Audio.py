@@ -13,7 +13,7 @@ class Audio:
         index = self._detect_microphones()[0]
         self.microphones = self.handle.open(input_device_index= index,
                                             channels=5,
-                                            format = pyaudio.paInt24,
+                                            format = pyaudio.paInt16,
                                             rate = self.Fs,
                                             input = True)
         self.playDevice = self.handle.open(format=pyaudio.paInt16, channels=1, rate=self.Fs, output=True)
@@ -33,7 +33,7 @@ class Audio:
         return j
 
     def sample(self, N):
-        return np.frombuffer(self.microphones.read(N), dtype='int32')
+        return np.frombuffer(self.microphones.read(N), dtype='int16')
 
     def split_data(self,data):
         mic1 = data[0::5]
@@ -51,11 +51,11 @@ class Audio:
         play.close()
 
     def writeAlltoWave(self, mic1, mic2,mic3,mic4,mic5, fileappendix = ''):
-        write(f'mic1.wav', self.Fs, mic1.astype(np.int16))
-        write(f'mic2.wav', self.Fs, mic2.astype(np.int16))
-        write(f'mic3.wav', self.Fs, mic3.astype(np.int16))
-        write(f'mic4.wav', self.Fs, mic4.astype(np.int16))
-        write(f'mic5.wav', self.Fs, mic5.astype(np.int16))
+        write(f'mic1{fileappendix}.wav', self.Fs, mic1.astype(np.int16))
+        write(f'mic2{fileappendix}.wav', self.Fs, mic2.astype(np.int16))
+        write(f'mic3{fileappendix}.wav', self.Fs, mic3.astype(np.int16))
+        write(f'mic4{fileappendix}.wav', self.Fs, mic4.astype(np.int16))
+        write(f'mic5{fileappendix}.wav', self.Fs, mic5.astype(np.int16))
 
     def write1toWav(self, data, filename = "File.wav"):
         write(filename, self.Fs, data)
