@@ -25,9 +25,10 @@ class KITT:
         self.r = int(0)
         self.batt = float(0)
 
-        for i in range(3):
+        for i in range(5):
             try:
                 self.serial = serial.Serial(port, baudrate, rtscts=True)
+                break
             except serial.serialutil.SerialException:
                 print(i)
         if self.serial == None:
@@ -79,7 +80,6 @@ class KITT:
     
     def print_status(self):
         string = str(self.sitrep())
-
         i = 0
         while i < len(string):
             if string[i] == "\\" and string [i+1] == "n":
@@ -90,9 +90,8 @@ class KITT:
                 print(string[i], end='')
 
             i = i + 1
-
         print()
-    
+
     def log_status(self):
         # This routine splits the string and puts it
         # into voariables that can be then logged
@@ -138,9 +137,41 @@ class KITT:
             now = datetime.now()
             current_time = now.strftime("%M:%S.%f")[:-3]
             with open('../data/report_log.csv', 'w', newline='') as csvfile:
-                writer = cs.writer(csvfile)
+                writer = csv.writer(csvfile)
                 writer.writerow(['Time', 'Sensor L', 'Sensor R'])
                 writer.writerow([current_time, self.l, self.r])
+
+    def updateDirectionKeyboard(self):
+        speed = 150
+        angle = 150
+
+        if keyboard.is_pressed('up') or keyboard.is_pressed('w'):
+            speed += 15
+
+        if keyboard.is_pressed('left') or keyboard.is_pressed('a'):
+            angle += 50
+
+        if keyboard.is_pressed('down') or keyboard.is_pressed('s'):
+            speed -= 15
+
+        if keyboard.is_pressed('right') or keyboard.is_pressed('d'):
+            angle -= 50
+
+        return speed, angle
+
+    def updateDirectionStick(): ## Low level implementation of joysticks TODO
+    
+        #with open(joystickFile, 'r') as joystick:
+        #    data = joystick.read()
+        ## +- 32767
+        xVal = 000 ## This is a test value
+        yVal = 000
+
+        x_pwm = 100/65534 * (xVal - 32747) + 100
+        y_pwm = 100/65534 * (yVal - 32747) + 100
+
+    def EstopCondition(): ## Function to check if ESTOP should be initiated automatically // TODO
+        return False
 
     def Estop(self):
         self.set_speed(135)
