@@ -7,8 +7,8 @@ import time
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
 
-#comPort = 'COM10'
-comPort = '/dev/rfcomm0'
+comPort = 'COM13'
+#comPort = '/dev/rfcomm0'
 joystickFile = '/dev/uinput'
 
 def tick():
