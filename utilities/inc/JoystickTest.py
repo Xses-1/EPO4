@@ -1,3 +1,5 @@
+#!/bin/python3.10
+
 import pyjoystick
 from pyjoystick.sdl2 import Key, Joystick, run_event_loop 
 
