@@ -36,16 +36,16 @@ Fs = 44100
 v = 343
 
 x = wavaudioread("../student_recording/reference.wav", Fs)
-y = wavaudioread("../student_recording/record_x82_y399.wav", Fs)
+y = wavaudioread("../student_recording/record_x150_y185.wav", Fs)
 
 Lhat = len(y) - len(x) + 1
 
 # find peaks
-incrementx = find_peaks(x[:,0], height=x[:,0][x[:,0].argmax()]*0.45)
-increment0 = find_peaks(y[:,0], height=y[:,0][y[:,0].argmax()]*0.45)
-increment1 = find_peaks(y[:,1], height=y[:,1][y[:,1].argmax()]*0.45)
-increment2 = find_peaks(y[:,2], height=y[:,2][y[:,2].argmax()]*0.45)
-increment3 = find_peaks(y[:,3], height=y[:,3][y[:,3].argmax()]*0.45)
+incrementx = find_peaks(x[:,0], height=x[:,0][x[:,0].argmax()]*0.4)
+increment0 = find_peaks(y[:,0], height=y[:,0][y[:,0].argmax()]*0.4)
+increment1 = find_peaks(y[:,1], height=y[:,1][y[:,1].argmax()]*0.4)
+increment2 = find_peaks(y[:,2], height=y[:,2][y[:,2].argmax()]*0.4)
+increment3 = find_peaks(y[:,3], height=y[:,3][y[:,3].argmax()]*0.4)
 
 #define increments
 incx0 = int(incrementx[0][0] - inc_value)
