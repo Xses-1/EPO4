@@ -6,10 +6,15 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
+
+if os.name == 'nt':
+    comPort = 'COM13'
+else:
+    comPort = '/dev/rfcomm0'
         
 if __name__ == '__main__':
-    kitt = KITT('COM13')
-    #kitt = KITT('/dev/rfcomm0')
+    kitt = KITT(comPort)
+
     while(1):
         for i in range(500,20000)[::100]:
             time.sleep(0.5)

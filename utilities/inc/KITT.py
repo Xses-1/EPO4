@@ -30,8 +30,12 @@ class KITT:
 
         self.history = []
 
-        n = len(os.listdir('../../utilities/data'))
-        self.filename = f'../../utilities/data/report_log{n}.csv'
+        if os.name == 'nt':
+            n = len(os.listdir('utilities/data'))
+            self.filename = f'utilities/data/report_log{n}.csv'
+        else:
+            n = len(os.listdir('../../utilities/data'))
+            self.filename = f'../../utilities/data/report_log{n}.csv'
 
         with open(self.filename, 'x') as csvfile:
             writer = csv.writer(csvfile)
@@ -81,7 +85,6 @@ class KITT:
         else:    
             self.serial.write(b'A1\n')
             self.BeaconFlag = True
-            print('lol')
     
     def stopBeacon(self):
         if self.BeaconFlag == True:
@@ -148,7 +151,10 @@ class KITT:
                 self.r = int((string[i+1:i+9].split('\\'))[0])
             
             if string[i] == 't' and string[i-1] == 't' and string[i-2] == 'a':
-                self.batt = float((string[i+2:i+9].split(' '))[0])
+                try:
+                    self.batt = float((string[i+2:i+9].split(' '))[0])
+                except ValueError:
+                    self.batt = 0.0
 
             i += 1
 

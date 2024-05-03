@@ -7,9 +7,10 @@ import time
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
 
-comPort = 'COM13'
-#comPort = '/dev/rfcomm0'
-joystickFile = '/dev/uinput'
+if os.name == 'nt':
+    comPort = 'COM13'
+else:
+    comPort = '/dev/rfcomm0'
 
 def tick():
     speed,angle = kitt.updateDirectionKeyboard()
