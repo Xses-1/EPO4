@@ -5,6 +5,7 @@ import os
 import time
 import csv
 from datetime import datetime
+import subprocess
 
 class KITT:
     def __init__(self, port, baudrate=115200):
@@ -50,7 +51,7 @@ class KITT:
         if self.serial == None:
             raise Exception
         
-        self.setBeacon(carrier_freq = 10000, bit_frequency = 5000, repition_count = 2500, code = 0xB00B1E50)
+        self.setBeacon(carrier_freq = 5000, bit_frequency = 5000, repition_count = 2500, code = 0xB00B1E50)
             
         # state variables such as speed, angle are defined here
 
@@ -198,16 +199,17 @@ class KITT:
 
         return speed, angle
 
-    def updateDirectionStick(self): ## Low level implementation of joysticks TODO
-    
-        #with open(joystickFile, 'r') as joystick:
-        #    data = joystick.read()
-        ## +- 32767
-        xVal = 000 ## This is a test value
-        yVal = 000
+    def initJoystick():
+        # Run the binnary as a separate process that will read the joysticks
+        popen = subprocess.Popen("../../utilities/bin/joystick", stdout=subprocess.PIPE)
 
-        x_pwm = 100/65534 * (xVal - 32747) + 100
-        y_pwm = 100/65534 * (yVal - 32747) + 100
+    def updateDirectionStick(self):
+        # Read from the stdout of the binary and update the joysticks
+        tmp = popen.stdout.read()
+        speed = int(str(number)[:3])
+        angle = int(str(number)[-3:])
+    
+        return speed, angle
 
     def EstopCondition(): ## Function to check if ESTOP should be initiated automatically // TODO
         return False
