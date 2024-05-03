@@ -36,7 +36,7 @@ Fs = 44100
 v = 343
 
 x = wavaudioread("../student_recording/reference.wav", Fs)
-y = wavaudioread("../student_recording/record_x64_y40.wav", Fs)
+y = wavaudioread("../student_recording/record_x82_y399.wav", Fs)
 
 Lhat = len(y) - len(x) + 1
 
@@ -66,12 +66,12 @@ h2 = ch3(x[incx0:incx1,0], y[incx0:inc21, 2], Lhat, epsi)
 h3 = ch3(x[incx0:incx1,0], y[incx0:inc31, 3], Lhat, epsi)
 
 #defining tau
-tau12 = h0.argmax() - h1.argmax()
-tau23 = h1.argmax() - h2.argmax()
-tau34 = h2.argmax() - h3.argmax()
-tau41 = h3.argmax() - h0.argmax()
-tau31 = h2.argmax() - h0.argmax()
-tau42 = h3.argmax() - h1.argmax()
+tau12 = (h0.argmax() - h1.argmax())*v/Fs
+tau23 = (h1.argmax() - h2.argmax())*v/Fs
+tau34 = (h2.argmax() - h3.argmax())*v/Fs
+tau14 = (h0.argmax() - h3.argmax())*v/Fs
+tau13 = (h0.argmax() - h2.argmax())*v/Fs
+tau24 = (h1.argmax() - h3.argmax())*v/Fs
 
 fig, ax = plt.subplots(2, 2, figsize=(10, 3))
 
@@ -84,15 +84,25 @@ ax[1,0].plot(h2)
 ax[1,1].set_title("channel 4")
 ax[1,1].plot(h3)
 
+#defining mic locations
+x1 = np.array([0, 0])
+x2 = np.array([0, 4.80])
+x3 = np.array([4.80, 4.80])
+x4 = np.array([4.80, 0])
 
-#Solving matrix A*C=B
-A = np.array([[1,-1,0,0],[-1, 0, 0, 1],[0, 1, -1, 0],[0, 0, 1, -1],[-1, 0, 1, 0],[0, -1, 0, 1]])
-B = np.array([(tau12*v)/Fs, (tau41*v)/Fs, (tau23*v)/Fs, (tau34*v)/Fs, (tau31*v)/Fs, (tau42*v)/Fs])
+#Solving matrix A*B=C
+A = np.array([[2*(x2[0]-x1[0]), 2*(x2[1]-x1[1]),-2*tau12, 0, 0],[2*(x3[0]-x1[0]), 2*(x3[1]-x1[1]),0, -2*tau13, 0], 
+              [2*(x4[0]-x1[0]), 2*(x4[1]-x1[1]),0, 0, -2*tau14],[2*(x3[0]-x2[0]), 2*(x3[1]-x2[1]),0, -2*tau23, 0], 
+              [2*(x4[0]-x2[0]), 2*(x4[1]-x2[1]),0, 0, -2*tau24],[2*(x4[0]-x3[0]), 2*(x4[1]-x3[1]),0, 0, -2*tau34]])
 
-C = np.dot(np.linalg.pinv(A), B) 
+C = np.array([tau12**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x2))**2, tau13**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x3))**2,
+              tau14**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x4))**2, tau23**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x3))**2,
+              tau24**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x4))**2, tau34**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x4))**2])
+
+B = np.dot(np.linalg.pinv(A), C)
 
 #print(incrementx[0][0], increment0[0][0], increment1[0][0], increment2[0][0], increment3[0][0])
-print(tau12, tau23, tau34, tau41, tau31, tau42)
+print(tau12, tau23, tau34, tau14, tau13, tau24)
 print(B)
 
 plt.show()
