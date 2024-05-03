@@ -35,10 +35,8 @@ if __name__ == '__main__':
     while True:
         try:
             tick()
-            os.system('clear')
-            kitt.print_status()
+            #kitt.print_status()
             kitt.log_status()
-            time.sleep(0.1)
 
         except KeyboardInterrupt:
             kitt.serial.close()
