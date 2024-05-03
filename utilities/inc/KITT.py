@@ -30,15 +30,13 @@ class KITT:
 
         self.history = []
 
-        n = len(os.listdir('utilities/data'))
-        self.filename = f'utilities/data/report_log{n}.csv'
+        n = len(os.listdir('../../utilities/data'))
+        self.filename = f'../../utilities/data/report_log{n}.csv'
 
         with open(self.filename, 'x') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['Time', 'Sensor L', 'Sensor R'])
+            writer.writerow(['Time', 'Sensor L', 'Sensor R', 'Battery V', 'One Direction', 'Motór'])
             
-        
-
         for i in range(5):
             try:
                 self.serial = serial.Serial(port, baudrate, rtscts=True)
@@ -48,7 +46,7 @@ class KITT:
         if self.serial == None:
             raise Exception
         
-        self.setBeacon(carrier_freq = 1000, bit_frequency = 50, repition_count = 2500, code = 0xB00B1E50)
+        self.setBeacon(carrier_freq = 10000, bit_frequency = 5000, repition_count = 2500, code = 0xB00B1E50)
             
         # state variables such as speed, angle are defined here
 
@@ -83,6 +81,7 @@ class KITT:
         else:    
             self.serial.write(b'A1\n')
             self.BeaconFlag = True
+            print('lol')
     
     def stopBeacon(self):
         if self.BeaconFlag == True:
@@ -141,26 +140,26 @@ class KITT:
 
             if string[i] == 't' and string[i-1] == 'o' and string[i-2] == 'M':
                 self.mot = int((string[i+3:i+9].split('\\'))[0])
-
+            
             if string[i] == 'L' and string[i-1] == ' ' and string[i-2] == '.':
-                self.l = int((string[i+3:i+9].split(' '))[0])
+                self.l = int((string[i+2:i+9].split(' '))[0])
 
             if string[i] == ' ' and string[i-1] == 'R' and string[i-2] == ' ':
-                self.r = int((string[i+3:i+9].split('\\'))[0])
-
+                self.r = int((string[i+1:i+9].split('\\'))[0])
+            
             if string[i] == 't' and string[i-1] == 't' and string[i-2] == 'a':
-                self.batt = float((string[i+3:i+9].split('\\'))[0])
+                self.batt = float((string[i+2:i+9].split(' '))[0])
 
             i += 1
 
-            # For now it only logs the sensors l, r, and a timestamp
-            now = datetime.now()
-            current_time = now.strftime("%M:%S.%f")[:-3]
-            with open(self.filename, 'a', newline='') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow([current_time,'  ' ,self.l, self.r])
+        # For now it only logs the sensors l, r, and a timestamp
+        now = datetime.now()
+        current_time = now.strftime("%M:%S.%f")[:-3]
+        with open(self.filename, 'a', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow([current_time, self.l, self.r, self.batt, self.dir, self.mot])
 
-        l = [self.l, self.r, self.batt]
+        l = [self.l, self.r, self.batt, self.dir, self.mot]
         self.history.append(l)
         return l
 
@@ -179,6 +178,13 @@ class KITT:
 
         if keyboard.is_pressed('right') or keyboard.is_pressed('d'):
             angle -= 50
+
+        if keyboard.is_pressed('q'):
+            self.startBeacon()
+
+        if keyboard.is_pressed('e'):
+            self.stopBeacon()
+
 
         return speed, angle
 
@@ -203,6 +209,9 @@ class KITT:
         self.stop()
         self.EstopF = True
 
+'''
     def __del__(self):
+        #idk what the hell is that but it's not working so fuck it
         self.serial.close()
+'''
 
