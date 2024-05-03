@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from scipy.fft import fft, ifft
 from scipy.signal import convolve, unit_impulse, find_peaks
+from scipy import linalg
 #from refsignal import refsignal
 from wavaudioread import wavaudioread 
 
@@ -28,7 +29,7 @@ def ch3(x,y,Lhat,epsi):
 
 epsi = 0.005
 
-inc_value = 500
+inc_value = 1000
 
 Fs = 44100
 
@@ -59,20 +60,18 @@ inc3 = int(increment3[0][0] -inc_value)
 inc31 = int(increment3[0][0] +inc_value)
 
 #channel modulation
-h0 = ch3(x[incx0:incx1,0], y[inc0:inc01, 0], Lhat, epsi)
-h1 = ch3(x[incx0:incx1,0], y[inc1:inc11, 1], Lhat, epsi)
-h2 = ch3(x[incx0:incx1,0], y[inc2:inc21, 2], Lhat, epsi)
-h3 = ch3(x[incx0:incx1,0], y[inc3:inc31, 3], Lhat, epsi)
+h0 = ch3(x[incx0:incx1,0], y[incx0:inc01, 0], Lhat, epsi)
+h1 = ch3(x[incx0:incx1,0], y[incx0:inc11, 1], Lhat, epsi)
+h2 = ch3(x[incx0:incx1,0], y[incx0:inc21, 2], Lhat, epsi)
+h3 = ch3(x[incx0:incx1,0], y[incx0:inc31, 3], Lhat, epsi)
 
-#h12 = ch3(y[inc0:inc01,0], y[inc1:inc11,1], Lhat, epsi)
-#h14 = ch3(y[inc0:inc01,0], y[inc3:inc31,3], Lhat, epsi)
-#h23 = ch3(y[inc1:inc11,1], y[inc2:inc21,2], Lhat, epsi)
-#h34 = ch3(y[inc2:inc21,2], y[inc3:inc31,3], Lhat, epsi)
-
-tau1 = h0.argmax() - h1.argmax()
-tau2 = h1.argmax() - h2.argmax()
-tau3 = h2.argmax() - h3.argmax()
-tau4 = h0.argmax() - h3.argmax()
+#defining tau
+tau12 = h0.argmax() - h1.argmax()
+tau23 = h1.argmax() - h2.argmax()
+tau34 = h2.argmax() - h3.argmax()
+tau41 = h3.argmax() - h0.argmax()
+tau31 = h2.argmax() - h0.argmax()
+tau42 = h3.argmax() - h1.argmax()
 
 fig, ax = plt.subplots(2, 2, figsize=(10, 3))
 
@@ -85,13 +84,15 @@ ax[1,0].plot(h2)
 ax[1,1].set_title("channel 4")
 ax[1,1].plot(h3)
 
-A = np.array([[1,-1,0,0],[-1,0,0,1],[0,1,-1,0],[0,0,1,-1]])
-B = np.array([(tau1*v)/Fs, (tau4*v)/Fs, (tau2*v)/Fs, (tau3*v)/Fs])
-Apinv = np.linalg.pinv(A)
-C = Apinv.dot(B)
 
-print(incrementx[0][0], increment0[0][0], increment1[0][0], increment2[0][0], increment3[0][0])
-print(tau1, tau2, tau3, tau4)
+#Solving matrix A*C=B
+A = np.array([[1,-1,0,0],[-1, 0, 0, 1],[0, 1, -1, 0],[0, 0, 1, -1],[-1, 0, 1, 0],[0, -1, 0, 1]])
+B = np.array([(tau12*v)/Fs, (tau41*v)/Fs, (tau23*v)/Fs, (tau34*v)/Fs, (tau31*v)/Fs, (tau42*v)/Fs])
+
+C = np.dot(np.linalg.pinv(A), B) 
+
+#print(incrementx[0][0], increment0[0][0], increment1[0][0], increment2[0][0], increment3[0][0])
+print(tau12, tau23, tau34, tau41, tau31, tau42)
 print(C)
 
 plt.show()
