@@ -93,6 +93,6 @@ C = np.dot(np.linalg.pinv(A), B)
 
 #print(incrementx[0][0], increment0[0][0], increment1[0][0], increment2[0][0], increment3[0][0])
 print(tau12, tau23, tau34, tau41, tau31, tau42)
-print(C)
+print(B)
 
 plt.show()
