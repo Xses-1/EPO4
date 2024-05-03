@@ -8,9 +8,9 @@ from Audio import Audio
 if __name__ == '__main__':
     mics = Audio()
 
-    data = mics.sample(1800000)#
+    N = 44100 * 2
+
+    data = mics.sample(N)#
     samples = mics.split_data(data)
 
-    mics.play_sound(samples[0])
-
-    mics.writeAlltoWave(samples[0], samples[1], samples[2], samples[3], samples[4], fileappendix = 'beacontest')
+    mics.writeto1Wav(samples[0], samples[1], samples[2], samples[3], samples[4], filename = 'beaconTestx250y250.wav')
