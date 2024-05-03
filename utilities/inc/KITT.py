@@ -79,6 +79,10 @@ class KITT:
         code = code.to_bytes(4, byteorder= 'big')
         self.serial.write(b'C' + code + b'\n')
 
+    def setFreq(self, freq):
+        freq = freq.to_bytes(2, byteorder= 'big')
+        self.serial.write( b'F' + freq + b'\n')
+
     def startBeacon(self):
         if self.BeaconFlag == True:
             return
