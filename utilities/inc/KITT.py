@@ -199,19 +199,25 @@ class KITT:
 
         return speed, angle
 
-    def initJoystick():
+    def initJoystick(self):
         # Run the binnary as a separate process that will read the joysticks
-        popen = subprocess.Popen("../../utilities/bin/joystick", stdout=subprocess.PIPE)
-
+        self.proc = subprocess.Popen("../../utilities/bin/joystick", stdout=subprocess.PIPE)
+        os.set_blocking(self.proc.stdout.fileno(), False)
+        
     def updateDirectionStick(self):
         # Read from the stdout of the binary and update the joysticks
-        tmp = popen.stdout.read()
-        speed = int(str(number)[:3])
-        angle = int(str(number)[-3:])
+        tmp = self.proc.stdout.readline()
+        if len(str(tmp)) < 8:
+            speed = 0
+            angle = 0
+
+        else:
+            speed = int(str(tmp)[2:5])
+            angle = int(str(tmp)[-6:-3])
     
         return speed, angle
 
-    def EstopCondition(): ## Function to check if ESTOP should be initiated automatically // TODO
+    def EstopCondition(): ## Should ESTOP be initiated automatically // TODO
         return False
 
     def Estop(self):

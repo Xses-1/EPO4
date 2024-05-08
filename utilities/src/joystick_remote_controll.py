@@ -15,8 +15,11 @@ else:
 def tick():
     speed,angle = kitt.updateDirectionStick()
 
-    kitt.set_speed(speed)
-    kitt.set_angle(angle)
+    if (speed != 0 and angle != 0):
+        kitt.set_speed(speed)
+        kitt.set_angle(angle)
+
+    print(speed, angle)
 
 def alt_c():
     global WhichInput
