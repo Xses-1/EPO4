@@ -25,8 +25,12 @@ class KITT:
         self.c_r = int(0)
         self.dir = int(0)
         self.mot = int(0)
+        self.time_old = time.monotonic()
+        self.time_new = time.monotonic() 
         self.l = int(0)
+        self.l_old = int(0)
         self.r = int(0)
+        self.r_old = int(0)
         self.batt = float(0)
 
         self.speed = int(150)
@@ -153,9 +157,13 @@ class KITT:
                 self.mot = int((string[i+3:i+9].split('\\'))[0])
             
             if string[i] == 'L' and string[i-1] == ' ' and string[i-2] == '.':
+                self.l_old = self.l
+                self.time_old = self.time_new
                 self.l = int((string[i+2:i+9].split(' '))[0])
+                self.time_new = time.monotonic() 
 
-            if string[i] == ' ' and string[i-1] == 'R' and string[i-2] == ' ':
+            if string[i] == ' ' and string[i-1] == 'R' and string[i-2] == ' ': ## no time here cause it would interfere and the milisecond difference will be fine
+                self.r_old = self.r
                 self.r = int((string[i+1:i+9].split('\\'))[0])
             
             if string[i] == 't' and string[i-1] == 't' and string[i-2] == 'a':
@@ -164,7 +172,11 @@ class KITT:
                 except ValueError:
                     self.batt = 0.0
 
+    
             i += 1
+        
+        if self.EstopCondition():
+            self.Estop()
 
         # For now it only logs the sensors l, r, and a timestamp
         now = datetime.now()
@@ -229,13 +241,38 @@ class KITT:
     
         return speed, angle
 
-    def EstopCondition(): ## Should ESTOP be initiated automatically // TODO
-        return False
+    def EstopCondition(self): ## Should ESTOP be initiated automatically // TODO
+        derR,derL = self.DistanceDerivative()
+        print(derR,derL)
+        if derR  == 0:
+            derR = 1e-33
+        elif abs(derR) > 20:
+            derR = 1e-33
+        
+        if derL == 0:  
+            derL = 1e-33
+        elif abs(derL) > 20:
+            derL = 1e-33
+        TimeToImpact = -min(self.l/derL, self.r/derR) 
+        print(f'Time = {TimeToImpact}')
+        if 0 < TimeToImpact < 3:
+            return True
+        else:
+            return False
+
+    def DistanceDerivative(self):
+        timediff = self.time_new - self.time_old
+        if timediff == 0:
+            timediff = 1e-33
+        derL = (self.l - self.l_old) / timediff
+        derR = (self.r - self.r_old) /  timediff
+        return derL, derR
+    
 
     def Estop(self):
         speed = -self.speed + 300
         self.set_speed(speed)
-        time.sleep(0.5)
+        time.sleep(1)
         self.stop()
         self.EstopF = True
 

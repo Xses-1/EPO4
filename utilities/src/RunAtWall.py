@@ -13,3 +13,5 @@ if __name__ == '__main__':
     while True:
         
         kitt.log_status()
+        kitt.set_speed(165)
+        
