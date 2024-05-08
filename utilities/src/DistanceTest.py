@@ -12,7 +12,7 @@ from wavaudioread import wavaudioread
 if __name__ == '__main__':
     mics = Audio()
     TD = TDOA()
-    N = int(44100 * 3)
+    N = int(44100 * 1)
 
     ref = wavaudioread("BeaconReference.wav", mics.Fs)
 
@@ -20,7 +20,5 @@ if __name__ == '__main__':
 
     while True:
         samples = mics.split_data(mics.sample(N))
-
-        
         
         print(TD.localization(ref, np.array(samples).T, mics.Fs))

@@ -18,7 +18,8 @@ class TDOA:
 
         # Force x to be the same length as y
         x = np.concatenate((x, np.zeros(Ny-Nx)))
-
+        
+        print(y)
         # Deconvolution in frequency domain
         Y = fft(y)
         X = fft(x)
@@ -37,7 +38,9 @@ class TDOA:
         v = 343
         Lhat = len(y) - len(x) + 1
 
+        print('test')
         print(y, x, Lhat)
+        print('test')
         # find peaks
         incrementx = find_peaks(x, height=x[x.argmax()]*0.4)
         increment0 = find_peaks(y[:,0], height=y[:,0][y[:,0].argmax()]*0.4)
@@ -57,6 +60,7 @@ class TDOA:
         #inc3 = int(increment3[0][0] -inc_value)
         inc31 = int(increment3[0][0] +inc_value)
 
+        print(incx0, incx1, inc01, inc11)
         #channel modulation
         h0 = self.ch3(x[incx0:incx1], y[incx0:inc01, 0], Lhat, epsi)
         h1 = self.ch3(x[incx0:incx1], y[incx0:inc11, 1], Lhat, epsi)
