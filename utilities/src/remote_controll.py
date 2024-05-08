@@ -8,7 +8,7 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
 
 if os.name == 'nt':
-    comPort = 'COM13'
+    comPort = 'COM22'
 else:
     comPort = '/dev/rfcomm0'
 
@@ -29,7 +29,7 @@ def alt_c():
 WhichInput = False
 
 if __name__ == '__main__':
-    keyboard.add_hotkey('alt+c', alt_c)
+    #keyboard.add_hotkey('alt+c', alt_c)
     
     kitt = KITT(comPort)
 
@@ -39,8 +39,10 @@ if __name__ == '__main__':
             #kitt.print_status()
             kitt.log_status()
 
+            time.sleep(0.1)
+
         except KeyboardInterrupt:
             kitt.serial.close()
-            break
+            sys.exit(1)
 
     kitt.serial.close()
