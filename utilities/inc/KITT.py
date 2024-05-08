@@ -6,6 +6,9 @@ import time
 import csv
 from datetime import datetime
 import subprocess
+import threading
+import queue 
+import collections
 
 class KITT:
     def __init__(self, port, baudrate=115200):
@@ -40,7 +43,7 @@ class KITT:
 
         with open(self.filename, 'x') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['Time', 'Sensor L', 'Sensor R', 'Battery V', 'One Direction', 'Motór'])
+            writer.writerow(['Time', 'Sensor_L', 'Sensor_R', 'Battery_V', 'One_Direction', 'Motór'])
             
         for i in range(5):
             try:
@@ -202,18 +205,27 @@ class KITT:
     def initJoystick(self):
         # Run the binnary as a separate process that will read the joysticks
         self.proc = subprocess.Popen("../../utilities/bin/joystick", stdout=subprocess.PIPE)
-        os.set_blocking(self.proc.stdout.fileno(), False)
+        # os.set_blocking(self.proc.stdout.fileno(), False)
+        self.q = collections.deque(maxlen=1)
+        t = threading.Thread(target=read_output, args=(self.proc, self.q.append))
+        t.daemon = True
+        t.start()
         
     def updateDirectionStick(self):
         # Read from the stdout of the binary and update the joysticks
-        tmp = self.proc.stdout.readline()
+        # tmp = self.proc.stdout.readline()
+        try:
+            tmp = self.q[0]
+        except IndexError:
+            tmp = 0
+
         if len(str(tmp)) < 8:
             speed = 0
             angle = 0
 
         else:
-            speed = int(str(tmp)[2:5])
-            angle = int(str(tmp)[-6:-3])
+            angle = int(str(tmp)[2:5])
+            speed = int(str(tmp)[-6:-3])
     
         return speed, angle
 
@@ -227,9 +239,7 @@ class KITT:
         self.stop()
         self.EstopF = True
 
-'''
-    def __del__(self):
-        #idk what the hell is that but it's not working so fuck it
-        self.serial.close()
-'''
 
+def read_output(process, append):
+    for line in iter(process.stdout.readline, ""):
+        append(line)
