@@ -36,7 +36,7 @@ Fs = 44100
 v = 343
 
 x = wavaudioread("../student_recording/reference.wav", Fs)
-y = wavaudioread("../student_recording/record_x150_y185.wav", Fs)
+y = wavaudioread("../student_recording/record_x_y_hidden_2.wav", Fs)
 
 Lhat = len(y) - len(x) + 1
 
