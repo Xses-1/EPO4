@@ -21,4 +21,4 @@ if __name__ == '__main__':
     while True:
         samples = mics.split_data(mics.sample(N))
         
-        print(TD.localization(ref, np.array(samples).T, mics.Fs))
+        print(f'TF', TD.localization(ref, np.array(samples).T, mics.Fs))
