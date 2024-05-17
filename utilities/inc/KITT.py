@@ -243,7 +243,6 @@ class KITT:
 
     def EstopCondition(self): ## Should ESTOP be initiated automatically // TODO
         derR,derL = self.DistanceDerivative()
-        print(derR,derL)
         if derR  == 0:
             derR = 1e-33
         elif abs(derR) > 20:
@@ -254,7 +253,6 @@ class KITT:
         elif abs(derL) > 20:
             derL = 1e-33
         TimeToImpact = -min(self.l/derL, self.r/derR) 
-        print(f'Time = {TimeToImpact}')
         if 0 < TimeToImpact < 3:
             return True
         else:
