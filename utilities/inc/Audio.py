@@ -8,28 +8,29 @@ Class for interacting with the microphones and
 '''
 
 class Audio:
-    def __init__(self, Fs = 44100, callback = False):
-        self.handle = pyaudio.PyAudio()
-        self.Fs = Fs
-        index = self._detect_microphones()[0]
-        if callback == False :
-            self.microphones = self.handle.open(input_device_index= index,
-                                                channels=5,
-                                                format = pyaudio.paInt16,
-                                                rate = self.Fs,
-                                                input = True,
-                                                )
-        else:
-            
-            self.microphones = self.handle.open(input_device_index = index,
-                                                channels=5,
-                                                format = pyaudio.paInt16,
-                                                rate = self.Fs,
-                                                input = True,
-                                                stream_callback= self.callback
-                                                )
-
-        self.callback_data = None    
+    def __init__(self, Fs = 44100, callback = False, noAudio = False):
+        if not noAudio:
+            self.handle = pyaudio.PyAudio()
+            self.Fs = Fs
+            index = self._detect_microphones()[0]
+            if callback == False :
+                self.microphones = self.handle.open(input_device_index= index,
+                                                    channels=5,
+                                                    format = pyaudio.paInt16,
+                                                    rate = self.Fs,
+                                                    input = True,
+                                                    )
+            else:
+                
+                self.microphones = self.handle.open(input_device_index = index,
+                                                    channels=5,
+                                                    format = pyaudio.paInt16,
+                                                    rate = self.Fs,
+                                                    input = True,
+                                                    stream_callback= self.callback
+                                                    )
+    
+            self.callback_data = None    
 
     def _detect_microphones(self):
         j = []

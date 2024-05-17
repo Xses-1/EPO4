@@ -9,25 +9,21 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 
 from Audio import Audio
 
-mics = Audio(callback = True)
+mics = Audio(callback = False)
 
 allData = []
 while True:
-    time.sleep(0.1)
+    N = int(44100 * 0.5)
+    data = mics.sample(N)#this is still blocking :(
 
-    allData += mics.callback_data
-
+    allData.append(data)
     if keyboard.is_pressed('escape'):
         break
 
-print(len(allData))
+print(len(allData), len(allData[2]))
 
-with open('runTest.pkl', 'wb') as outp:
+with open('runTestwithVideo.pkl', 'wb') as outp:
     pickle.dump(allData, outp, pickle.HIGHEST_PROTOCOL)
-
-mic1,mic2,mic3,mic4,mic5 = mics.split_data(allData)
-
-mics.writeAlltoWave(mic1,mic2,mic3,mic4,mic5, fileappendix = 'RunaroundTest')
 
 mics.close()
     
