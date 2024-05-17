@@ -2,21 +2,34 @@ import pyaudio
 import numpy as np
 from scipy.io.wavfile import write
 import sys
+import pickle
 '''
 Class for interacting with the microphones and 
 '''
 
 class Audio:
-    def __init__(self):
+    def __init__(self, Fs = 44100, callback = False):
         self.handle = pyaudio.PyAudio()
-        self.Fs = 44100
+        self.Fs = Fs
         index = self._detect_microphones()[0]
-        self.microphones = self.handle.open(input_device_index= index,
-                                            channels=5,
-                                            format = pyaudio.paInt16,
-                                            rate = self.Fs,
-                                            input = True)
-        self.playDevice = self.handle.open(format=pyaudio.paInt16, channels=1, rate=self.Fs, output=True)
+        if callback == False :
+            self.microphones = self.handle.open(input_device_index= index,
+                                                channels=5,
+                                                format = pyaudio.paInt16,
+                                                rate = self.Fs,
+                                                input = True,
+                                                )
+        else:
+            
+            self.microphones = self.handle.open(input_device_index = index,
+                                                channels=5,
+                                                format = pyaudio.paInt16,
+                                                rate = self.Fs,
+                                                input = True,
+                                                stream_callback= self.callback
+                                                )
+
+        self.callback_data = None    
 
     def _detect_microphones(self):
         j = []
@@ -31,6 +44,11 @@ class Audio:
         print(j)
 
         return j
+    
+    def callback(self,in_data, frame_count, time_info, status):
+        self.callback_data = np.frombuffer(in_data, dtype='int16')
+
+        return in_data, pyaudio.paContinue
 
     def sample(self, N):
         return np.frombuffer(self.microphones.read(N), dtype='int16')
@@ -60,5 +78,16 @@ class Audio:
     def write1toWav(self, data, filename = "File.wav"):
         write(filename, self.Fs, data)
 
-    def writeto1Wav(self,  mic1, mic2,mic3,mic4,mic5, filename = "File.wav"):
-        write(filename, self.Fs, [mic1.astype(np.int16),mic2.astype(np.int16),mic3.astype(np.int16),mic4.astype(np.int16),mic5.astype(np.int16)])
+    def saveToPickle(self, data, filename = "File.pkl"):
+        with open('runTest.pkl', 'wb') as outp:
+            pickle.dump(data, outp, pickle.HIGHEST_PROTOCOL)
+
+    ## deleted writeto1wav because it didnt work
+
+    def close(self):
+        self.microphones.close()
+        self.handle.terminate()
+
+    def __del__(self):
+        self.microphones.close()
+        self.handle.terminate()

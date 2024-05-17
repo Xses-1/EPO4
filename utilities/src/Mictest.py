@@ -7,9 +7,7 @@ from Audio import Audio
 
 if __name__ == '__main__':
     mics = Audio()
-
     N = 44100 * 2
-
     data = mics.sample(N)#
     samples = mics.split_data(data)
 
