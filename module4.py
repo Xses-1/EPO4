@@ -24,7 +24,8 @@ class KITTmodel():
         dX = dA + dB
 
         self.velocity_state_vector += (dX * dt)
-        v = self.velocity_state_vector[0][0] ## Basically np.dot(velocity_state_vector, C) but faster
+        v = self.velocity_state_vector[1][0] ## Basically np.dot(velocity_state_vector, C) but faster
+        print(v)
         return(v)
 
     def steering_state(self, phi, v):
