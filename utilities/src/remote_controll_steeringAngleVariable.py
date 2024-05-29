@@ -8,28 +8,28 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
 
 if os.name == 'nt':
-    comPort = 'COM7'
+    comPort = 'COM5'
 else:
     comPort = '/dev/rfcomm0'
 
-steeringAngle = 0
+deltaspeed = 0
 
 def tick():
     speed,angle = kitt.updateDirectionKeyboard()
 
     if keyboard.is_pressed('M'):
-        global steeringAngle
-        if steeringAngle != 50:
-            steeringAngle  += 10
+        global deltaspeed
+        if deltaspeed != 15:
+            deltaspeed  += 5
         else:
-            steeringAngle = 10
+            deltaspeed = 5
 
-        print( f'steeringAngle: {steeringAngle}')
+        print( f'deltaspeed: {deltaspeed}')
 
-    if angle > 150:
-        angle = 150 + steeringAngle
-    if angle < 150:
-        angle = 150 - steeringAngle
+    if speed > 150:
+        speed = 150 + deltaspeed
+    if speed < 150:
+        speed = 150 - deltaspeed
 
     kitt.set_speed(speed)
     kitt.set_angle(angle)
@@ -43,6 +43,8 @@ if __name__ == '__main__':
     while True:
         try:
             tick()
+            kitt.log_status()
+            kitt.log_status()
 
             time.sleep(0.1)
 
