@@ -35,151 +35,53 @@ class TDOA:
 
     def localization(self, x, y, Fs):
         epsi = 0.01
-        inc_value = 1000
         v = 343.21
         Lhat = len(y) - len(x) + 1
-
-        plt.plot(y)
-
+    
         x = x[len(x)-25000:]
         y = y[len(y)-25000:]
-
-        #plt.plot(y)
 
         h0 = self.ch3(x, y[:, 0], Lhat, epsi)
         h1 = self.ch3(x, y[:, 1], Lhat, epsi)
         h2 = self.ch3(x, y[:, 2], Lhat, epsi)
         h3 = self.ch3(x, y[:, 3], Lhat, epsi)
+        h4 = self.ch3(x, y[:, 4], Lhat, epsi)
 
         tau12 = ((abs(h0).argmax() - abs(h1).argmax())*v/Fs)
-        tau23 = ((abs(h1).argmax() - abs(h2).argmax())*v/Fs)
-        tau34 = ((abs(h2).argmax() - abs(h3).argmax())*v/Fs)
         tau14 = ((abs(h0).argmax() - abs(h3).argmax())*v/Fs)
         tau13 = ((abs(h0).argmax() - abs(h2).argmax())*v/Fs)
-        tau24 = ((abs(h1).argmax() - abs(h3).argmax())*v/Fs)
-
-        print(tau12,tau23,tau34,tau14,tau13,tau24)
+        tau15 = ((abs(h0).argmax() - abs(h4).argmax())*v/Fs)
 
         x1 = np.array([0, 0])
         x2 = np.array([0, 4.80])
         x3 = np.array([4.80, 4.80])
         x4 = np.array([4.80, 0])
-
+        x5 = np.array([0, 2.40])
         
+        A = np.array([[x1[0]-x2[0],x1[1]-x2[1],tau12],
+                      [x1[0]-x3[0],x1[1]-x3[1],tau13],
+                      [x1[0]-x4[0],x1[1]-x4[1],tau14],
+                      [x1[0]-x5[0],x1[1]-x5[1],tau15]])
+        
+        C = np.array([[0.5*(x1[0]**2-x2[0]**2+x1[1]**2-x2[1]**2+tau12**2)],
+                      [0.5*(x1[0]**2-x3[0]**2+x1[1]**2-x3[1]**2+tau13**2)],
+                      [0.5*(x1[0]**2-x4[0]**2+x1[1]**2-x4[1]**2+tau14**2)],
+                      [0.5*(x1[0]**2-x5[0]**2+x1[1]**2-x5[1]**2+tau15**2)]])
 
-        A = np.array([[ 2*(x2[0]-x1[0]).T,
-                        2*(x2[1]-x1[1]).T,
-                        -2*tau12, 0, 0],
+        B = np.linalg.lstsq(A, C, rcond=None)[0][:2].flatten()
 
-                      [ 2*(x3[0]-x1[0]).T,
-                        2*(x3[1]-x1[1]).T,
-                        0, -2*tau13, 0],
-
-                      [ 2*(x4[0]-x1[0]).T,
-                        2*(x4[1]-x1[1]).T,
-                        0, 0, -2*tau14],
-
-                      [ 2*(x3[0]-x2[0]).T,
-                        2*(x3[1]-x2[1]).T,
-                        0, -2*tau23, 0],
-
-                      [ 2*(x4[0]-x2[0]).T,
-                        2*(x4[1]-x2[1]).T,
-                        0, 0, -2*tau24],
-
-                      [ 2*(x4[0]-x3[0]).T,
-                        2*(x4[1]-x3[1]).T,
-                        0, 0, -2*tau34]])
-
-        C = np.array([  tau12**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x2))**2,
-                        tau13**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x3))**2,
-                        tau14**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x4))**2,
-                        tau23**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x3))**2,
-                        tau24**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x4))**2,
-                        tau34**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x4))**2])
-
-        B = np.dot(np.linalg.pinv(A), C)
-
-
-
-        '''
-        A = np.array([[ 2*np.transpose(x2[0]-x1[0]),
-                        2*np.transpose(x2[1]-x1[1]),
-                        2*np.transpose(x2[2]-x1[2]),
-                        -2*tau12, 0, 0, 0],
-
-	                 [  2*np.transpose(x3[0]-x1[0]),
-                        2*np.transpose(x3[1]-x1[1]),
-                        2*np.transpose(x3[2]-x1[2]),
-                        0, -2*tau13, 0, 0],
-
-                     [  2*np.transpose(x4[0]-x1[0]),
-                        2*np.transpose(x4[1]-x1[1]),
-                        2*np.transpose(x4[2]-x1[2]),
-                        0, 0, -2*tau14, 0],
-
-                     [  2*np.transpose(x5[0]-x1[0]),
-                        2*np.transpose(x5[1]-x1[1]),
-                        2*np.transpose(x5[2]-x1[2]),
-                        0, 0, 0, -2*tau15],
-
-                     [  2*np.transpose(x3[0]-x2[0]),
-                        2*np.transpose(x3[1]-x2[1]),
-                        2*np.transpose(x3[2]-x2[2]),
-                        0, -2*tau23, 0, 0],
-
-                     [  2*np.transpose(x4[0]-x2[0]),
-                        2*np.transpose(x4[1]-x2[1]),
-                        2*np.transpose(x4[2]-x2[2]),
-                        0, 0, -2*tau24, 0],
-
-                    [   2*np.transpose(x5[0]-x2[0]),
-                        2*np.transpose(x5[1]-x2[1]),
-                        2*np.transpose(x5[2]-x2[2]),
-                        0, 0, 0, -2*tau25],
-
-                     [  2*np.transpose(x4[0]-x3[0]),
-                        2*np.transpose(x4[1]-x3[1]),
-                        2*np.transpose(x4[2]-x3[2]),
-                        0, 0, -2*tau34, 0],
-
-                    [   2*np.transpose(x5[0]-x3[0]),
-                        2*np.transpose(x5[1]-x3[1]),
-                        2*np.transpose(x5[2]-x3[2]),
-                        0, 0, 0, -2*tau35],
-
-                     [  2*np.transpose(x5[0]-x4[0]),
-                        2*np.transpose(x5[1]-x4[1]),
-                        2*np.transpose(x5[2]-x4[2]),
-                        0, 0, 0, -2*tau45] ])
-
-        C = np.array([tau12**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x2))**2, 
-                      tau13**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x3))**2,
-                      tau14**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x4))**2,
-                      tau15**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x5))**2,
-                      tau23**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x3))**2,
-                      tau24**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x4))**2,
-                      tau25**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x5))**2, 
-                      tau34**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x4))**2,
-                      tau35**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x5))**2,
-                      tau45**2-(np.linalg.norm(x4))**2+(np.linalg.norm(x5))**2])
-
-        B = np.dot(np.linalg.pinv(A), C)
-        #B = np.linalg.lstsq(A, C, rcond=None)[0]
-        '''
-
+        print(B)
         return B
     
 Fs = 44100
 
 a = wavaudioread("reference.wav", Fs)
 a = a[:,0]
-b = wavaudioread("record_x143_y296.wav", Fs)
+#b = wavaudioread("record_x232_y275.wav", Fs)
+b = wavaudioread("record_x4_y_hidden_1.wav", Fs)
 
 T = TDOA()
 c = T.localization(a,b,Fs)
 
 error = np.sqrt((1.43-c[0])**2+(2.96-c[1])**2)
 print(error)
-
-print(c)
