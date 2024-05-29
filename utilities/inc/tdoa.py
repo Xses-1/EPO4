@@ -58,8 +58,6 @@ class TDOA:
         tau13 = ((abs(h0).argmax() - abs(h2).argmax())*v/Fs)
         tau24 = ((abs(h1).argmax() - abs(h3).argmax())*v/Fs)
 
-        print(tau12,tau23,tau34,tau14,tau13,tau24)
-
         x1 = np.array([0, 0])
         x2 = np.array([0, 4.80])
         x3 = np.array([4.80, 4.80])
@@ -101,74 +99,52 @@ class TDOA:
         B = np.dot(np.linalg.pinv(A), C)
 
 
-
-        '''
-        A = np.array([[ 2*np.transpose(x2[0]-x1[0]),
-                        2*np.transpose(x2[1]-x1[1]),
-                        2*np.transpose(x2[2]-x1[2]),
-                        -2*tau12, 0, 0, 0],
-
-	                 [  2*np.transpose(x3[0]-x1[0]),
-                        2*np.transpose(x3[1]-x1[1]),
-                        2*np.transpose(x3[2]-x1[2]),
-                        0, -2*tau13, 0, 0],
-
-                     [  2*np.transpose(x4[0]-x1[0]),
-                        2*np.transpose(x4[1]-x1[1]),
-                        2*np.transpose(x4[2]-x1[2]),
-                        0, 0, -2*tau14, 0],
-
-                     [  2*np.transpose(x5[0]-x1[0]),
-                        2*np.transpose(x5[1]-x1[1]),
-                        2*np.transpose(x5[2]-x1[2]),
-                        0, 0, 0, -2*tau15],
-
-                     [  2*np.transpose(x3[0]-x2[0]),
-                        2*np.transpose(x3[1]-x2[1]),
-                        2*np.transpose(x3[2]-x2[2]),
-                        0, -2*tau23, 0, 0],
-
-                     [  2*np.transpose(x4[0]-x2[0]),
-                        2*np.transpose(x4[1]-x2[1]),
-                        2*np.transpose(x4[2]-x2[2]),
-                        0, 0, -2*tau24, 0],
-
-                    [   2*np.transpose(x5[0]-x2[0]),
-                        2*np.transpose(x5[1]-x2[1]),
-                        2*np.transpose(x5[2]-x2[2]),
-                        0, 0, 0, -2*tau25],
-
-                     [  2*np.transpose(x4[0]-x3[0]),
-                        2*np.transpose(x4[1]-x3[1]),
-                        2*np.transpose(x4[2]-x3[2]),
-                        0, 0, -2*tau34, 0],
-
-                    [   2*np.transpose(x5[0]-x3[0]),
-                        2*np.transpose(x5[1]-x3[1]),
-                        2*np.transpose(x5[2]-x3[2]),
-                        0, 0, 0, -2*tau35],
-
-                     [  2*np.transpose(x5[0]-x4[0]),
-                        2*np.transpose(x5[1]-x4[1]),
-                        2*np.transpose(x5[2]-x4[2]),
-                        0, 0, 0, -2*tau45] ])
-
-        C = np.array([tau12**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x2))**2, 
-                      tau13**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x3))**2,
-                      tau14**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x4))**2,
-                      tau15**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x5))**2,
-                      tau23**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x3))**2,
-                      tau24**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x4))**2,
-                      tau25**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x5))**2, 
-                      tau34**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x4))**2,
-                      tau35**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x5))**2,
-                      tau45**2-(np.linalg.norm(x4))**2+(np.linalg.norm(x5))**2])
-
-        B = np.dot(np.linalg.pinv(A), C)
-        #B = np.linalg.lstsq(A, C, rcond=None)[0]
-        '''
-
         return B
+
+    def closest_mic(self, X, Y):
+        if (X < 240) and (Y < 240):
+            the_closest_mic = 1
+
+        elif (X < 240) and (Y > 240):
+            the_closest_mic = 2
+
+        elif (X > 240) and (Y > 240):
+            the_closest_mic = 3
+
+        else:
+            the_closest_mic = 4
+
+        return the_closest_mic
+
+    def error_correction(self, X, Y, cl_mic):
+        l = X**2 + Y**2
+        Xn = X
+        Yn = Y
+        Z = 25
+
+        if (cl_mic == 1):
+            while (Xn**2 + Yn**2 + Z**2) < l:
+                Xn = Xn + 1
+                Yn = Yn + 1
+
+        elif (cl_mic == 2):
+            while (Xn**2 + Yn**2 + Z**2) < l:
+                Xn = Xn - 1
+                Yn = Yn + 1
+
+        elif rcl_mic == 3):
+            while (Xn**2 + Yn**2 + Z**2) < l:
+                Xn = Xn - 1
+                Yn = Yn - 1
+
+        else:
+            while (Xn**2 + Yn**2 + Z**2) < l:
+                Xn = Xn - 1
+                Yn = Yn - 1
+
+        return Xn, Yn
+
+        
     
 Fs = 44100
 
@@ -179,7 +155,20 @@ b = wavaudioread("record_x143_y296.wav", Fs)
 T = TDOA()
 c = T.localization(a,b,Fs)
 
+# Testing before the error compensation
 error = np.sqrt((1.43-c[0])**2+(2.96-c[1])**2)
 print(error)
-
 print(c)
+
+# c structure:
+# X, Y, distance to mic 2, distance to mic 3, distance to mic 4
+X = c[0] * 100
+Y = c[1] * 100
+
+# First find the closes mic, so in which quadrant are we in
+cl_mic = T.closest_mic(X, Y)
+print (cl_mic)
+
+# Now try to correct for the error
+X, Y = error_correction(X, Y, cl_mic)
+print(X, Y)
