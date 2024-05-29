@@ -2,91 +2,122 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from scipy.fft import fft, ifft
-from scipy.signal import convolve, unit_impulse, find_peaks
+from scipy.signal import convolve, unit_impulse
 from scipy import linalg
-#from refsignal import refsignal
+
+import samplerate
+from scipy.io import wavfile
 
 
+def wavaudioread(filename, fs):
+    fs_wav, y_wav = wavfile.read(filename)
+    y = samplerate.resample(y_wav, fs / fs_wav, "sinc_best")
+
+    return y
 
 class TDOA:
     def ch3(self,x,y,Lhat,epsi):
-        Nx = len(x)       # Length of x
-        Ny = len(y)      # Length of y
-        Nh = Lhat      
-        
-         # Length of h
+        Nx = len(x)       
+        Ny = len(y)      
+        Nh = Lhat 
 
-        # Force x to be the same length as y
         x = np.concatenate((x, np.zeros(Ny-Nx)))
-        
-        # Deconvolution in frequency domain
+
         Y = fft(y)
         X = fft(x)
         H = Y/X
 
-        # Threshold to avoid blow ups of noise during inversion
         H[np.absolute(X) < epsi*max(np.absolute(X))] = 0
+        h = np.real(ifft(H)) 
 
-        h = np.real(ifft(H))  # ensure the result is real
-        #h = h[:Lhat] # optional: truncate to length Lhat (L is not reliable?)
         return h
 
     def localization(self, x, y, Fs):
-        epsi = 0.005
-        inc_value = 5000
-        v = 343
+        epsi = 0.01
+        inc_value = 1000
+        v = 343.21
         Lhat = len(y) - len(x) + 1
 
-        # find peaks
-        incrementx = find_peaks(x, height=x[x.argmax()]*0.4)
-        increment0 = find_peaks(y[:,0], height=y[:,0][y[:,0].argmax()]*0.4)
-        increment1 = find_peaks(y[:,1], height=y[:,1][y[:,1].argmax()]*0.4)
-        increment2 = find_peaks(y[:,2], height=y[:,2][y[:,2].argmax()]*0.4)
-        increment3 = find_peaks(y[:,3], height=y[:,3][y[:,3].argmax()]*0.4)
+        plt.plot(y)
 
-        #define increments
-        incx0 = int(incrementx[0][0] - inc_value)
-        incx1 = int(incrementx[0][0] + inc_value)
-        #inc0 = int(increment0[0][0] - inc_value)
-        inc01 = int(increment0[0][0] + inc_value)
-        #inc1 = int(increment1[0][0] - inc_value)
-        inc11 = int(increment1[0][0] + inc_value)
-        #inc2 = int(increment2[0][0] -inc_value)
-        inc21 = int(increment2[0][0] +inc_value)
-        #inc3 = int(increment3[0][0] -inc_value)
-        inc31 = int(increment3[0][0] +inc_value)
+        x = x[len(x)-25000:]
+        y = y[len(y)-25000:]
 
-        #channel modulation
-        h0 = self.ch3(x[incx0:incx1], y[:, 0], Lhat, epsi)
-        h1 = self.ch3(x[incx0:incx1], y[:, 1], Lhat, epsi)
-        h2 = self.ch3(x[incx0:incx1], y[:, 2], Lhat, epsi)
-        h3 = self.ch3(x[incx0:incx1], y[:, 3], Lhat, epsi)
+        #plt.plot(y)
 
-        plt.plot(h1)
+        h0 = self.ch3(x, y[:, 0], Lhat, epsi)
+        h1 = self.ch3(x, y[:, 1], Lhat, epsi)
+        h2 = self.ch3(x, y[:, 2], Lhat, epsi)
+        h3 = self.ch3(x, y[:, 3], Lhat, epsi)
+        h4 = self.ch3(x, y[:, 4], Lhat, epsi)
+
+        fig, ax = plt.subplots(3,2,figsize=(15,8))
+
+        ax[0,0].plot(abs(h0))
+        ax[0,1].plot(abs(h1))
+        ax[1,0].plot(abs(h2))
+        ax[1,1].plot(abs(h3))
+        ax[2,0].plot(abs(h4))
+        fig.tight_layout()
         plt.show()
-        #defining tau
-        tau12 = (h0.argmax() - h1.argmax())*v/Fs
-        tau23 = (h1.argmax() - h2.argmax())*v/Fs
-        tau34 = (h2.argmax() - h3.argmax())*v/Fs
-        tau14 = (h0.argmax() - h3.argmax())*v/Fs
-        tau13 = (h0.argmax() - h2.argmax())*v/Fs
-        tau24 = (h1.argmax() - h3.argmax())*v/Fs
 
-        #defining mic locations
-        x1 = np.array([0, 0])
-        x2 = np.array([0, 4.80])
-        x3 = np.array([4.80, 4.80])
-        x4 = np.array([4.80, 0])
+        tau12 = ((abs(h0).argmax() - abs(h1).argmax())*v/Fs)
+        tau23 = ((abs(h1).argmax() - abs(h2).argmax())*v/Fs)
+        tau34 = ((abs(h2).argmax() - abs(h3).argmax())*v/Fs)
+        tau14 = ((abs(h0).argmax() - abs(h3).argmax())*v/Fs)
+        tau13 = ((abs(h0).argmax() - abs(h2).argmax())*v/Fs)
+        tau24 = ((abs(h1).argmax() - abs(h3).argmax())*v/Fs)
+        tau15 = ((abs(h0).argmax() - abs(h4).argmax())*v/Fs)
+        tau25 = ((abs(h1).argmax() - abs(h4).argmax())*v/Fs)
+        tau35 = ((abs(h2).argmax() - abs(h4).argmax())*v/Fs)
+        tau45 = ((abs(h3).argmax() - abs(h4).argmax())*v/Fs)
 
-        #Solving matrix A*B=C
-        A = np.array([[2*(x2[0]-x1[0]), 2*(x2[1]-x1[1]),-2*tau12, 0, 0],[2*(x3[0]-x1[0]), 2*(x3[1]-x1[1]),0, -2*tau13, 0], 
-                      [2*(x4[0]-x1[0]), 2*(x4[1]-x1[1]),0, 0, -2*tau14],[2*(x3[0]-x2[0]), 2*(x3[1]-x2[1]),0, -2*tau23, 0], 
-                      [2*(x4[0]-x2[0]), 2*(x4[1]-x2[1]),0, 0, -2*tau24],[2*(x4[0]-x3[0]), 2*(x4[1]-x3[1]),0, 0, -2*tau34]])
+        print(tau12,tau23,tau34,tau14,tau13,tau24,tau15,tau25,tau35,tau45)
 
-        C = np.array([tau12**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x2))**2, tau13**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x3))**2,
-                    tau14**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x4))**2, tau23**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x3))**2,
-                    tau24**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x4))**2, tau34**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x4))**2])
+        x1 = np.array([0, 0, 0.252])
+        x2 = np.array([0, 4.80, 0.252])
+        x3 = np.array([4.80, 4.80, 0.252])
+        x4 = np.array([4.80, 0, 0.252])
+        x5 = np.array([0, 2.40, 0.552])
+
+        
+
+        A = np.array([[2*np.transpose(x2[0]-x1[0]), 2*np.transpose(x2[1]-x1[1]), 2*np.transpose(x2[2]-x1[2]),-2*tau12, 0, 0, 0],
+	                 [2*np.transpose(x3[0]-x1[0]), 2*np.transpose(x3[1]-x1[1]), 2*np.transpose(x3[2]-x1[2]),0, -2*tau13, 0, 0], 
+                     [2*np.transpose(x4[0]-x1[0]), 2*np.transpose(x4[1]-x1[1]), 2*np.transpose(x4[2]-x1[2]),0, 0, -2*tau14, 0],
+                     [2*np.transpose(x5[0]-x1[0]), 2*np.transpose(x5[1]-x1[1]), 2*np.transpose(x5[2]-x1[2]),0, 0, 0, -2*tau15], 
+                     [2*np.transpose(x3[0]-x2[0]), 2*np.transpose(x3[1]-x2[1]), 2*np.transpose(x3[2]-x2[2]),0, -2*tau23, 0, 0], 
+                     [2*np.transpose(x4[0]-x2[0]), 2*np.transpose(x4[1]-x2[1]), 2*np.transpose(x4[2]-x2[2]),0, 0, -2*tau24, 0],
+                     [2*np.transpose(x5[0]-x2[0]), 2*np.transpose(x5[1]-x2[1]), 2*np.transpose(x5[2]-x2[2]),0, 0, 0, -2*tau25], 
+                     [2*np.transpose(x4[0]-x3[0]), 2*np.transpose(x4[1]-x3[1]), 2*np.transpose(x4[2]-x3[2]),0, 0, -2*tau34, 0],
+                     [2*np.transpose(x5[0]-x3[0]), 2*np.transpose(x5[1]-x3[1]), 2*np.transpose(x5[2]-x3[2]),0, 0, 0, -2*tau35],
+                     [2*np.transpose(x5[0]-x4[0]), 2*np.transpose(x5[1]-x4[1]), 2*np.transpose(x5[2]-x4[2]),0, 0, 0, -2*tau45] ])
+
+        C = np.array([tau12**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x2))**2, 
+                      tau13**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x3))**2,
+                      tau14**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x4))**2,
+                      tau15**2-(np.linalg.norm(x1))**2+(np.linalg.norm(x5))**2,
+                      tau23**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x3))**2,
+                      tau24**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x4))**2,
+                      tau25**2-(np.linalg.norm(x2))**2+(np.linalg.norm(x5))**2, 
+                      tau34**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x4))**2,
+                      tau35**2-(np.linalg.norm(x3))**2+(np.linalg.norm(x5))**2,
+                      tau45**2-(np.linalg.norm(x4))**2+(np.linalg.norm(x5))**2])
 
         B = np.dot(np.linalg.pinv(A), C)
-
+        #B = np.linalg.lstsq(A, C, rcond=None)[0]
         return B
+    
+Fs = 44100
+
+a = wavaudioread("reference.wav", Fs)
+a = a[:,0]
+b = wavaudioread("record_x143_y296.wav", Fs)
+
+T = TDOA()
+c = T.localization(a,b,Fs)
+
+error = np.sqrt((1.43-c[0])**2+(2.96-c[1])**2)
+print(error)
+
+print(c)
