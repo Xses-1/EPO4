@@ -19,9 +19,7 @@ class KITTmodel():
         B = np.array([[0], [1/m], [0]])
         C = np.array([0, 1, 0])
 
-        dA = np.matmul(A, self.velocity_state_vector)
-        dB = B * F_m
-        dX = dA + dB
+        dX = (np.matmul(A, self.velocity_state_vector)) + (B * F_m)
 
         self.velocity_state_vector += (dX * dt)
         v = self.velocity_state_vector[1][0] ## Basically np.dot(velocity_state_vector, C) but faster
