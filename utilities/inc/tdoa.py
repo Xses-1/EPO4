@@ -70,7 +70,7 @@ class TDOA:
 
         B = np.linalg.lstsq(A, C, rcond=None)[0][:2].flatten()
 
-        print(B)
+        #print(B)
         return B
 
     def closest_mic(self, X, Y):

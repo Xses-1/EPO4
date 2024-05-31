@@ -12,7 +12,7 @@ from Audio import Audio
 mics = Audio(callback = False)
 
 allData = []
-while True:
+while True: 
     N = int(44100 * 0.5)
     data = mics.sample(N)#this is still blocking :(
 
