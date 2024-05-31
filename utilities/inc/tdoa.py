@@ -1,4 +1,4 @@
-#!/bin/python3.10
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
@@ -104,7 +104,7 @@ class TDOA:
                 Xn = Xn - 1
                 Yn = Yn + 1
 
-        elif rcl_mic == 3):
+        elif (cl_mic == 3):
             while (Xn**2 + Yn**2 + Z**2) < l:
                 Xn = Xn - 1
                 Yn = Yn - 1
@@ -116,32 +116,8 @@ class TDOA:
 
         return Xn, Yn
 
-        
-    
-Fs = 44100
+    def tdoa_input(self,mic1,mic2,mic3,mic4,mic5): 
+        b = []
+        b = np.stack((mic1, mic2, mic3, mic4, mic5), axis =-1)
 
-a = wavaudioread("reference.wav", Fs)
-a = a[:,0]
-#b = wavaudioread("record_x232_y275.wav", Fs)
-b = wavaudioread("record_x4_y_hidden_1.wav", Fs)
-
-T = TDOA()
-c = T.localization(a,b,Fs)
-
-# Testing before the error compensation
-error = np.sqrt((1.43-c[0])**2+(2.96-c[1])**2)
-print(error)
-print(c)
-
-# c structure:
-# X, Y, distance to mic 2, distance to mic 3, distance to mic 4
-X = c[0] * 100
-Y = c[1] * 100
-
-# First find the closes mic, so in which quadrant are we in
-cl_mic = T.closest_mic(X, Y)
-print (cl_mic)
-
-# Now try to correct for the error
-X, Y = error_correction(X, Y, cl_mic)
-print(X, Y)
+        return b
