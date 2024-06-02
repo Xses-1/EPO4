@@ -93,9 +93,9 @@ class PID:
                 break
 
 
-        return (PWM2 - PWM1)/(Force2 - Force1) (Force - Force1) + PWM1
+        return int(np.round((PWM2 - PWM1)/(Force2 - Force1) (Force - Force1) + PWM1, 0))
 
     def AngletoPWM(self, Angle):
-        return 10/6 * Angle + 150
+        return int(np.round(10/6 * Angle + 150, 0))
     
     

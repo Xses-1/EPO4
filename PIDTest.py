@@ -42,6 +42,7 @@ fig, ax = plt.subplots()
 line, = ax.plot(t, TestPIDForce(init_kp, init_ki, init_kd), lw=2)
 line2  = ax.plot(t, Setpointsy)
 ax.set_xlabel('Time [s]')
+ax.set_ylabel('distance [m]')
 ax.set_ylim(-1,4)
 fig.subplots_adjust(bottom=0.2, left = 0.03, top = 0.98, right = 0.99)
 
