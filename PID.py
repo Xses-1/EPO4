@@ -15,11 +15,11 @@ class PID:
         self.ForceList  = [7.16,4.06,0.49,0,-1,47,-3.38,-7.16]
         self.PWMList    = [165,160,156,150,145,140,135]
 
-        self.ForceKp = 65529.223
+        self.ForceKp = 8.6
         self.ForceKi = 0
-        self.ForceKd = 0
+        self.ForceKd = 0.13
 
-        self.AngleKp = 1
+        self.AngleKp = -0.1
         self.AngleKi = 0
         self.AngleKd = 0
 
@@ -28,6 +28,7 @@ class PID:
         x = setpointx - currx
         y = setpointy - curry
         deltaP = np.sqrt((x)**2 + (y)**2)
+
         if deltaP != 0:
             angle = np.angle(x + (y * 1j) , deg = True)
             if angle < 0:
@@ -61,8 +62,8 @@ class PID:
 
         Force = (self.ForceKp * deltaP) + (self.ForceKi * self.distIntegral) + (self.ForceKd * distDiff)
 
-        if abs(Force) > 7.16:
-            Force = np.sign(Force) * 7.16
+        if abs(Force) > self.maxForce:
+            Force = np.sign(Force) * self.maxForce
         return Force
     
     def calculateAngle(self, deltaTheta, deltaT):
@@ -73,16 +74,21 @@ class PID:
 
         Angle = (self.AngleKp * deltaTheta) + (self.AngleKi * self.angleIntegral) + (self.AngleKd * angleDiff)
 
+        if abs(Angle) > self.maxAngle:
+            Angle = np.sign(Angle) * self.maxAngle
+
         return Angle
     
-    def Update(self, setpointx, setpointy, currx, curry, deltaT):
-        deltaP, deltaTheta = self.CalculateErrors(setpointx, setpointy, currx, curry)
+    def Update(self, setpointx, setpointy, currx, curry, currentAngle, deltaT):
+        deltaP, deltaTheta = self.CalculateErrors(setpointx, setpointy, currx, curry, currentAngle)
 
         Force = self.calculateForce(deltaP, deltaT)
         Angle = self.calculateAngle(deltaTheta, deltaT)
 
         return Force, Angle
     
+
+
     def ForcetoPWM(self, Force):
         for i in range(1,self.ForceList):
             if self.ForceList[i-1] <= Force <= self.ForceList[i]:

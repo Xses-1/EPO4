@@ -49,9 +49,9 @@ class KITTmodel():
         ##directionVector = np.matmul(unitVector, rotationVector)
 
                                                 ## intrinsic unit vector method
+
         directionVector = np.array([[np.cos(theta)],
                                    [np.sin(theta)]])
-                                
 
         self.position_state_vector += (directionVector * v * dt)
         
@@ -59,6 +59,8 @@ class KITTmodel():
     
     def return_Theta(self, phi, v, dt):
         self.theta += (self.steering_state(phi, v) * dt)
+        if self.theta >= 360:
+            self.theta -= 360
         return self.theta
     
     def update(self, phi, F_m, dt):
@@ -68,5 +70,5 @@ class KITTmodel():
         
         self.position_state(v, Theta, dt)
 
-        return self.position_state_vector
+        return self.position_state_vector, Theta
 
