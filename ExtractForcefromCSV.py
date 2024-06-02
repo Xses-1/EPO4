@@ -2,14 +2,14 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 
-with open("utilities\\data\\report_log5.csv", "r") as file:
+with open("utilities\\data\\report_log11.csv", "r") as file:
     data = list(csv.reader(file, delimiter=","))
 
 T = []
 L = []
 R = []
 motor = []
-for i in data[20:]:
+for i in data[226:]:
     T.append(i[0])
     L.append(int(i[1]))
     R.append(int(i[2]))
@@ -43,12 +43,22 @@ while i < len(z) - window_size + 1:
     # Shift window to right by one position
     i += 1
 
-vel = np.gradient(moving_averages)  
+t = []
+for i in T:
+    t.append(float(i[3:]))
+
+print(t)
+
+vel = []
+for i in range(1,len(moving_averages)):
+    vel.append((moving_averages[i] - moving_averages[i - 1]) / t[i])
 
 
 acc = np.gradient(vel)
 
 fig, ax = plt.subplots(2,2)
+
+
 
 ax[0][0].plot(L, label='sensorL')
 ax[0][0].plot(R, label='sensorR')
@@ -57,7 +67,7 @@ ax[0][0].legend()
 ax[0][1].plot(vel, label='Velocity average both sensor')
 ax[0][1].legend()
 ax[1][0].plot(acc, label='acceleration z')
-ax[1][0].hlines(0,0,100, colors = 'red')
+ax[1][0].hlines(0,0,20, colors = 'red')
 ax[1][0].legend()
 ax[1][1].plot(motor, label='motor')
 ax[1][1].legend()

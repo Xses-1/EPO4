@@ -12,7 +12,7 @@ class KITTmodel():
 
 
     def velocity_state(self, F_m, dt):
-        b = 5
+        b = 4.15
         m = 5.6
 
         A = np.array([[0, 1, 0],[0, -b/m, 0], [0, 0, -b/m]])
@@ -23,7 +23,6 @@ class KITTmodel():
 
         self.velocity_state_vector += (dX * dt)
         v = self.velocity_state_vector[1][0] ## Basically np.dot(velocity_state_vector, C) but faster
-        print(v)
         return(v)
 
     def steering_state(self, phi, v):
