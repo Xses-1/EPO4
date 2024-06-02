@@ -31,6 +31,13 @@ def TestPIDForce(kp,ki,kd):
 
         F = Pid.calculateForce(deltaP, dt)
 
+    z = np.array(z)
+    try:
+        print(f'Rise Time: {t[(0.9<z) & (z < 1)][0]}')
+    except IndexError:
+        print("never reaches equilibrium")
+
+
     return z
 
 init_kp = 1
@@ -43,7 +50,7 @@ line, = ax.plot(t, TestPIDForce(init_kp, init_ki, init_kd), lw=2)
 line2  = ax.plot(t, Setpointsy)
 ax.set_xlabel('Time [s]')
 ax.set_ylabel('distance [m]')
-ax.set_ylim(-1,4)
+ax.set_ylim(-0.5,2)
 fig.subplots_adjust(bottom=0.2, left = 0.1, top = 0.98, right = 0.99)
 
 axKp = fig.add_axes([0.05, 0.1, 0.25, 0.03])

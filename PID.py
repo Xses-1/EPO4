@@ -54,7 +54,7 @@ class PID:
     def calculateForce(self, deltaP, deltaT):
         ## Ku = 55529.223
 
-        self.distIntegral += deltaP
+        self.distIntegral += deltaP/deltaT
         distDiff = (self.LastdistError - deltaP) / deltaT
 
         self.lastdistError = deltaP
@@ -93,7 +93,7 @@ class PID:
                 break
 
 
-        return int(np.round((PWM2 - PWM1)/(Force2 - Force1) (Force - Force1) + PWM1, 0))
+        return int(np.round((PWM2 - PWM1)/(Force2 - Force1) (Force - Force1) + PWM1,))
 
     def AngletoPWM(self, Angle):
         return int(np.round(10/6 * Angle + 150, 0))
