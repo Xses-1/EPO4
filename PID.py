@@ -17,11 +17,15 @@ class PID:
 
         self.ForceKp = 8.6
         self.ForceKi = 0
-        self.ForceKd = 0.13
+        self.ForceKd = 0
 
         self.AngleKp = -0.1
         self.AngleKi = 0
         self.AngleKd = 0
+        
+        
+        ## test values
+        self.angle = 0
 
 
     def CalculateErrors(self, setpointx, setpointy, currx, curry, currentAngle):
@@ -31,6 +35,7 @@ class PID:
 
         if deltaP != 0:
             angle = np.angle(x + (y * 1j) , deg = True)
+            self.angle = angle                                                      ## Test Value
             if angle < 0:
                 angle += 360
             deltaTheta1 = angle - currentAngle
@@ -40,16 +45,17 @@ class PID:
                 deltaTheta1 = 0
             if deltaTheta2 == 360:
                 deltaTheta2 = 0
-
+            
+            
             if deltaTheta1 <= deltaTheta2:
                 deltaTheta = deltaTheta1
             else:
                 deltaTheta = deltaTheta2
                 deltaP = -deltaP
 
+
         else:
             return 0.0,0.0
-
         return deltaP, deltaTheta
     
     def calculateForce(self, deltaP, deltaT):
@@ -60,10 +66,13 @@ class PID:
 
         self.lastdistError = deltaP
 
+        #print(deltaP, self.distIntegral, distDiff)
         Force = (self.ForceKp * deltaP) + (self.ForceKi * self.distIntegral) + (self.ForceKd * distDiff)
+        #print(Force)
 
         if abs(Force) > self.maxForce:
             Force = np.sign(Force) * self.maxForce
+
         return Force
     
     def calculateAngle(self, deltaTheta, deltaT):

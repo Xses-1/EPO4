@@ -5,10 +5,10 @@ import control as ct
 import control.matlab as matlab
 
 class KITTmodel():
-    def __init__(self):
+    def __init__(self): ## Should probably input the starting position and shit
         self.velocity_state_vector = np.array([[0.0],[0.0],[0.0]]) ## Z,v,a
         self.position_state_vector = np.array([[0.0],[0.0]])       ## x,y
-        self.theta = 0
+        self.theta = 90.0
 
 
     def velocity_state(self, F_m, dt):
@@ -17,7 +17,7 @@ class KITTmodel():
 
         A = np.array([[0, 1, 0],[0, -b/m, 0], [0, 0, -b/m]])
         B = np.array([[0], [1/m], [0]])
-        C = np.array([0, 1, 0])
+        #C = np.array([0, 1, 0])
 
         dX = (np.matmul(A, self.velocity_state_vector)) + (B * F_m)
 
@@ -27,7 +27,7 @@ class KITTmodel():
 
     def steering_state(self, phi, v):
         L = 0.335 #m            ## L is a constant and should just be stored internally
-        sin = np.sin(phi)
+        sin = np.sin(np.deg2rad(-phi))
 
         if sin == 0:            ## avoid divide by 0 error
             return 0
