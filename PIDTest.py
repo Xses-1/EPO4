@@ -44,7 +44,7 @@ line2  = ax.plot(t, Setpointsy)
 ax.set_xlabel('Time [s]')
 ax.set_ylabel('distance [m]')
 ax.set_ylim(-1,4)
-fig.subplots_adjust(bottom=0.2, left = 0.03, top = 0.98, right = 0.99)
+fig.subplots_adjust(bottom=0.2, left = 0.1, top = 0.98, right = 0.99)
 
 axKp = fig.add_axes([0.05, 0.1, 0.25, 0.03])
 Kp_slider = Slider(
