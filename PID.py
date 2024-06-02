@@ -8,44 +8,70 @@ class PID:
 
         self.distIntegral = 0
         self.LastdistError = 0
+
+        self.maxForce = 7.16
+        self.maxAngle = 30
         
+        self.ForceList  = [7.16,4.06,0.49,0,-1,47,-3.38,-7.16]
+        self.PWMList    = [165,160,156,150,145,140,135]
+
+        self.ForceKp = 65529.223
+        self.ForceKi = 0
+        self.ForceKd = 0
+
+        self.AngleKp = 1
+        self.AngleKi = 0
+        self.AngleKd = 0
+
 
     def CalculateErrors(self, setpointx, setpointy, currx, curry, currentAngle):
-        deltaP = np.sqrt((setpointx - currx)**2 + (setpointy - curry)**2)
+        x = setpointx - currx
+        y = setpointy - curry
+        deltaP = np.sqrt((x)**2 + (y)**2)
         if deltaP != 0:
-            print(setpointx - currx)
-            deltaTheta = np.degrees(np.deg2rad(currentAngle) - np.arctan((setpointy - curry) / (setpointx - currx)))
-            print(deltaTheta)
+            angle = np.angle(x + (y * 1j) , deg = True)
+            if angle < 0:
+                angle += 360
+            deltaTheta1 = angle - currentAngle
+            deltaTheta2 = angle + 180 - currentAngle
+
+            if deltaTheta1 == 360:
+                deltaTheta1 = 0
+            if deltaTheta2 == 360:
+                deltaTheta2 = 0
+
+            if deltaTheta1 <= deltaTheta2:
+                deltaTheta = deltaTheta1
+            else:
+                deltaTheta = deltaTheta2
+                deltaP = -deltaP
+
         else:
             return 0.0,0.0
 
         return deltaP, deltaTheta
     
     def calculateForce(self, deltaP, deltaT):
-        Kp = 1.2
-        Ki = 0
-        Kd = 0
+        ## Ku = 55529.223
 
         self.distIntegral += deltaP
         distDiff = (self.LastdistError - deltaP) / deltaT
 
         self.lastdistError = deltaP
 
-        Force = (Kp * deltaP) + (Ki * self.distIntegral) + (Kd * distDiff)
+        Force = (self.ForceKp * deltaP) + (self.ForceKi * self.distIntegral) + (self.ForceKd * distDiff)
 
+        if abs(Force) > 7.16:
+            Force = np.sign(Force) * 7.16
         return Force
     
     def calculateAngle(self, deltaTheta, deltaT):
-        Kp = 1
-        Ki = 0
-        Kd = 0
-
         self.angleIntegral += deltaTheta
         angleDiff = (self.LastAngleError - deltaTheta) / deltaT
 
         self.LastAngleError = deltaTheta
 
-        Angle = (Kp * deltaTheta) + (Ki * self.angleIntegral) + (Kd * angleDiff)
+        Angle = (self.AngleKp * deltaTheta) + (self.AngleKi * self.angleIntegral) + (self.AngleKd * angleDiff)
 
         return Angle
     
@@ -56,5 +82,20 @@ class PID:
         Angle = self.calculateAngle(deltaTheta, deltaT)
 
         return Force, Angle
+    
+    def ForcetoPWM(self, Force):
+        for i in range(1,self.ForceList):
+            if self.ForceList[i-1] <= Force <= self.ForceList[i]:
+                PWM1 = self.PWMList[i-1]
+                PWM2 = self.PWMList[i]
+                Force1 = self.ForceList[i-1]
+                Force2 = self.ForceList[i]
+                break
+
+
+        return (PWM2 - PWM1)/(Force2 - Force1) (Force - Force1) + PWM1
+
+    def AngletoPWM(self, Angle):
+        return 10/6 * Angle + 150
     
     
