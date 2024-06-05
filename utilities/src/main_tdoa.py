@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+from pathlib import Path
 
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from wavaudioread import wavaudioread
