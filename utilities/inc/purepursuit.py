@@ -16,7 +16,7 @@ class purePursuit:
         self.wheelbase = 0.335
         self.x_location = 0
         self.y_location = 0
-        self.lookAheadDistance = 0.5 # the radius of the circle
+        self.lookAheadDistance = 0.8 # the radius of the circle
 
     def intersections(self, _location_x, _location_y, _x1, _y1, _x2, _y2):
         """_summary_
@@ -60,7 +60,7 @@ class purePursuit:
         _   steering_angle: steering angle
         """
 
-        _alpha = orientation - np.arctan2((_x_tp - self.x_location), (_y_tp - self.y_location))
+        _alpha = np.arctan2((_y_tp - self.y_location), (_x_tp - self.x_location)) - orientation
         
         with open('test.txt', 'a') as f:
             f.write(f' gamma = {_alpha}')
