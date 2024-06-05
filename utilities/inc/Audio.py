@@ -56,9 +56,9 @@ class Audio:
 
     def split_data(self,data):
         mic1 = data[0::5]
-        mic4 = data[1::5]
-        mic2 = data[2::5]
-        mic3 = data[3::5]
+        mic2 = data[1::5]
+        mic3 = data[2::5]
+        mic4 = data[3::5]
         mic5 = data[4::5]
 
         return [mic1,mic2,mic3,mic4,mic5]

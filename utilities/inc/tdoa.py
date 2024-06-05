@@ -33,19 +33,58 @@ class TDOA:
 
         return h
 
-    def localization(self, x, y, Fs):
+    def localization(self, x1,x2,x3,x4,x5, y, Fs):
         epsi = 0.01
         v = 343.21
-        Lhat = len(y) - len(x) + 1
+        Lhat1 = len(y) - len(x1) + 1
+        Lhat2 = len(y) - len(x2) + 1
+        Lhat3 = len(y) - len(x3) + 1
+        Lhat4 = len(y) - len(x4) + 1
+        Lhat5 = len(y) - len(x5) + 1
     
-        x = x[len(x)-25000:]
+        x1 = x1[len(x1)-25000:]
+        x2 = x2[len(x2)-25000:]
+        x3 = x3[len(x3)-25000:]
+        x4 = x4[len(x4)-25000:]
+        x5 = x5[len(x5)-25000:]
+
+
         y = y[len(y)-25000:]
 
-        h0 = self.ch3(x, y[:, 0], Lhat, epsi)
-        h1 = self.ch3(x, y[:, 1], Lhat, epsi)
-        h2 = self.ch3(x, y[:, 2], Lhat, epsi)
-        h3 = self.ch3(x, y[:, 3], Lhat, epsi)
-        h4 = self.ch3(x, y[:, 4], Lhat, epsi)
+        plt.plot(y[:,0])
+
+        h0 = self.ch3(x1, y[:, 0], Lhat1, epsi)
+        h1 = self.ch3(x2, y[:, 1], Lhat2, epsi)
+        h2 = self.ch3(x3, y[:, 2], Lhat3, epsi)
+        h3 = self.ch3(x4, y[:, 3], Lhat4, epsi)
+        h4 = self.ch3(x5, y[:, 4], Lhat5, epsi)
+
+        fig, ax = plt.subplots(2, 2, figsize=(15, 8))
+
+        ax[0,0].set_title("Recording 1, channel 1")
+        ax[0,0].plot(abs(h0))
+        ax[0,0].set_xlabel("Samples")
+        ax[0,0].set_ylabel("Magnitude")
+        ax[0,1].set_title("Recording 1, channel 2")
+        ax[0,1].plot(abs(h1))
+        ax[0,1].set_xlabel("Samples")
+        ax[0,1].set_ylabel("Magnitude")
+        ax[1,0].set_title("Recording 1, channel 3")
+        ax[1,0].plot(abs(h2))
+        ax[1,0].set_xlabel("Samples")
+        ax[1,0].set_ylabel("Magnitude")
+        ax[1,1].set_title("Recording 1, channel 4")
+        ax[1,1].plot(abs(h3))
+        ax[1,1].set_xlabel("Samples")
+        ax[1,1].set_ylabel("Magnitude")
+        fig.tight_layout()
+        plt.show()
+
+        print(abs(h0).argmax())
+        print(abs(h1).argmax())
+        print(abs(h2).argmax())
+        print(abs(h3).argmax())
+        print(abs(h4).argmax())
 
         tau12 = ((abs(h0).argmax() - abs(h1).argmax())*v/Fs)
         tau14 = ((abs(h0).argmax() - abs(h3).argmax())*v/Fs)
