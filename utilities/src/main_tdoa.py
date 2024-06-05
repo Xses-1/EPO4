@@ -12,15 +12,21 @@ class main_tdoa:
         if __name__ == '__main__':
             N = 44100 * 1
             Fs = 44100
-            x = wavaudioread("reference.wav", Fs)
-            x = x[:,0]
+            root_folder = Path("IntegrationTest.py").resolve().parent
+    
+            x1 = wavaudioread(root_folder / "utilities/data/Reference1.wav", Fs)    #Using reference recordings from all microphones
+            x2 = wavaudioread(root_folder / "utilities/data/Reference2.wav", Fs)    #Every channel estimate/microphone uses it's own 
+            x3 = wavaudioread(root_folder / "utilities/data/Reference3.wav", Fs)    #reference signal
+            x4 = wavaudioread(root_folder / "utilities/data/Reference4.wav", Fs)
+            x5 = wavaudioread(root_folder / "utilities/data/Reference5.wav", Fs)
 
-            mics = Audio(callback = True)
+            mics = Audio() #callback = True?
             data = mics.callback_data
             samples = mics.split_data(data)
             
             T = TDOA()
             y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
-            c = T.localization(x, y, Fs)
+            c = T.localization(x1, x2, x3, x4, x5, y, Fs)
+            print(c)
 
             return c

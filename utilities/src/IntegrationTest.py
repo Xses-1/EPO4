@@ -13,15 +13,16 @@ if __name__ == '__main__':
     N = 44100 * 1
     data = mics.sample(N)#
     samples = mics.split_data(data)
+
     T = TDOA()
     y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
-    Fs = 44100
 
+    Fs = 44100
     root_folder = Path("IntegrationTest.py").resolve().parent
     
-    x1 = wavaudioread(root_folder / "utilities/data/Reference1.wav", Fs)
-    x2 = wavaudioread(root_folder / "utilities/data/Reference2.wav", Fs)
-    x3 = wavaudioread(root_folder / "utilities/data/Reference3.wav", Fs)
+    x1 = wavaudioread(root_folder / "utilities/data/Reference1.wav", Fs)    #Using reference recordings from all microphones
+    x2 = wavaudioread(root_folder / "utilities/data/Reference2.wav", Fs)    #Every channel estimate/microphone uses it's own 
+    x3 = wavaudioread(root_folder / "utilities/data/Reference3.wav", Fs)    #reference signal
     x4 = wavaudioread(root_folder / "utilities/data/Reference4.wav", Fs)
     x5 = wavaudioread(root_folder / "utilities/data/Reference5.wav", Fs)
     #x = x[:,0]
