@@ -21,7 +21,7 @@ if __name__ == '__main__':
     print(a1)
     y = T.tdoa_input(a1[0], a1[1], a1[2], a1[3], a1[4])
     Fs = 44100
-    x = wavaudioread("reference.wav", Fs)
+    x = wavaudioread("BeaconReference.wav", Fs)
     x = x[:,0]
 
     c = T.localization(x, y, Fs)
