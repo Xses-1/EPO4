@@ -54,18 +54,17 @@ cX = float(input())
 cY = float(input())
 
 
-# Get the starting time and initialize the time counter
-time0 = time.monotonic()
-run_time = 0
-
-
 
 # The loop function:
 i = 0
 while(1):
     # Getting the PWMs to move the car to the correct direction
     pwmSteering = purePursuit.steering(theta, run_time, tX, tY, cX, cY)
-    pwmMotor    = purePursuit.forcePID(theta, run_time, tX, tY, cX, cY)
+    pwmMotor    = PID.forcePID(theta, run_time, tX, tY, cX, cY)
+    pwmMotor    = 160 # Can be fixed for testing
+
+    # Get the time when the car started to move
+    time_old = monotonic()
 
     # Transmitting the PWMs to the car and making it move
     KITT.set_spped(pwmMotor)
@@ -75,7 +74,7 @@ while(1):
     time.sleep(0.5)
 
     # Calcualting the current position of the car with the model
-    run_time = time.monotonic() - time0
+    run_time = time.monotonic() - time_old
     cX, cY, theta = KITTmodel.position(run_time, pwmMotor, pwmSteering)
 
     # Calibrate the current position any other time
