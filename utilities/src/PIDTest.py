@@ -1,12 +1,12 @@
 from module4 import KITTmodel
-from PID import PID
+from EPO4.Inc.PID import PID
 import numpy as np
 import matplotlib.pyplot as plt
 
 from matplotlib.widgets import Button, Slider
 
 positionx = 0.0
-positiony = 1.0
+positiony = 2.0
 currentAngle = 90.0
 
 t = np.linspace(0,40,2000)

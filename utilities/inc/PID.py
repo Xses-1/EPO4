@@ -15,7 +15,7 @@ class PID:
         self.ForceList  = [7.16,4.06,0.49,0,-1,47,-3.38,-7.16]
         self.PWMList    = [165,160,156,150,145,140,135]
 
-        self.ForceKp = 8.6
+        self.ForceKp = 2
         self.ForceKi = 0
         self.ForceKd = 0
 

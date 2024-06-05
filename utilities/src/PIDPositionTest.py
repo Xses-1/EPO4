@@ -1,17 +1,21 @@
-from module4 import KITTmodel
-from PID import PID
 import numpy as np
 import matplotlib.pyplot as plt
 
 from matplotlib.widgets import Button, Slider
 
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
+from module4 import KITTmodel
+from PID import PID
+
 positionx = 1.0
 positiony = 1.0
 currentAngle = 90.0
 
-waittime = 100
-movetime = 1900
-t = np.linspace(0,10,2000)
+waittime = 10
+movetime = 190
+t = np.linspace(0,10,200)
 Setpointsx = np.concatenate([np.zeros(waittime), [positionx] * movetime])
 Setpointsy = np.concatenate([np.zeros(waittime), [positiony] * movetime])
 
@@ -118,7 +122,6 @@ Kd_slider = Slider(
 )
 
 def update(val):
-    print('update')
     x, y, phis, Thetas = TestPIDIntegration(Kp_slider.val,ki_slider.val ,Kd_slider.val)
     line1.set_xdata(x)
     line1.set_ydata(y)

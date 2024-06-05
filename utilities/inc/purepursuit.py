@@ -3,6 +3,7 @@ import numpy as np
 from shapely.geometry import LineString
 from shapely.geometry import Point
 from module4 import KITTmodel
+from PID import PID
 
 class purePursuit:
     start_point = []
@@ -15,7 +16,8 @@ class purePursuit:
         self.wheelbase = 0.335
         self.x_location = 0
         self.y_location = 0
-        self.lookAheadDistance = 1 # the radius of the circle us
+        self.lookAheadDistance = 0.1 # the radius of the circle us
+        self.fixedOrientation = 0.5*math.pi
 
     def intersections(self, _location_x, _location_y, _x1, _y1, _x2, _y2):
         """_summary_
@@ -32,8 +34,6 @@ class purePursuit:
                 _y1 (_type_): start position y
                 _x2 (_type_): end position x
                 _y2 (_type_): end position y
-            Raises:
-                IndexError: if there are no intersection there is an error
             Returns:
                 _type_: array of intersection coordinates
         """
@@ -48,52 +48,58 @@ class purePursuit:
         elif len(_intersection.coords) == 1:
             return np.array([(_intersection.coords[0])])
         else:
-            raise IndexError("No intersections found")
+            return [(0,0),(0, 0)]
     
-    def steeringAngle(self, _x_tp, _y_tp):
+    def steeringAngle(self, _x_tp, _y_tp, orientation):
         """deterimines the steering angle for kitt based on the target point
         Args:
             x_tp (_type_): x coordinate of the target point
             y_tp (_type_): y coordinate of the target point
+            orientation  : current orientation of the car
         Returns:
         _   steering_angle: steering angle
         """
 
-        _alpha = np.arctan2((_x_tp - self.x_location), (_y_tp -
-            self.y_location))
-        _angle = np.arctan2((2 * self.wheelbase * np.sin(_alpha - np.radians(0.5*math.pi)))/self.lookAheadDistance)
+        _alpha = np.arctan2((_x_tp - self.x_location), (_y_tp - self.y_location)) - orientation 
+        print(_alpha)
+        _angle = np.arctan((2 * self.wheelbase * np.sin(_alpha - np.radians(0.5*math.pi)))/self.lookAheadDistance)
 
         return _angle
 
-    def distance_calc(x2, y2, x1, y1):
+    def distance_calc(self, x2, y2, x1, y1):
         _distance = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         return _distance
     
-    def point_selection(point_1, point_2, x_destination, y_destination):
-        _distance_1 = purePursuit.distance_calc(point_1[1], point_1[0], x_destination,
+    def point_selection(self, point_1, point_2, x_destination, y_destination):
+        _distance_1 = self.distance_calc(point_1[1], point_1[0], x_destination,
         y_destination)
-        _distance_2 = purePursuit.distance_calc(point_2[1], point_2[0], y_destination,
+        _distance_2 = self.distance_calc(point_2[1], point_2[0], y_destination,
         x_destination)
         if _distance_1 <= _distance_2:
             return point_1
         else:
             return point_2
     
-    def purepursuit(self, _x_position, _y_position, _x_target, _y_target):
+    def purepursuit(self, _x_position, _y_position, _x_target, _y_target, orientation):
         """
         Args:
             _x_position: x coordinate of the car
             _y_position: y coordinate of the car
             _x_target:   x coordinate of the target point
             _y_target:   y coordinate of the target point
+            orientation: current orientation of the car
+        Returns:
+            angle      : steering angle in radians
         """
+        
+        self.intersection = self.intersections(_x_position, _y_position, _x_position, _y_position, _x_target, _y_target)
+        #self.intersection_2 = self.intersections(_x_position, _y_position, _x_position, _y_position, _x_target, _y_target)[1]
 
-        self.intersection_1 = self.intersections(self, _x_position, _y_position, _x_position, _y_position, _x_target, _y_target)[0]
-        self.intersection_2 = self.intersections(self, _x_position, _y_position, _x_position, _y_position, _x_target, _y_target)[1]
+        self.Target = self.point_selection(self.intersection[0], self.intersection[1], _x_target, _y_target)
 
-        self.Target = purePursuit.point_selection(self.intersection_1, self.intersection_2, _x_target, _y_target)
-
-        self.angle = purePursuit.steeringAngle(self, self.Target[0], self.Target[1])
+        self.angle = self.steeringAngle(self.Target[0], self.Target[1], orientation)
         #angle = purePursuit.steeringAngle(self, 
+
+        return self.angle
 
     
