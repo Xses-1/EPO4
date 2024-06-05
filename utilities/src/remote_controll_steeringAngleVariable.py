@@ -12,7 +12,7 @@ if os.name == 'nt':
 else:
     comPort = '/dev/rfcomm0'
 
-deltaspeed = 0
+deltangle = 0
 
 def tick():
     speed,angle = kitt.updateDirectionKeyboard()
@@ -30,6 +30,18 @@ def tick():
         speed = 150 + deltaspeed
     if speed < 150:
         speed = 150 - deltaspeed
+        global deltangle
+        if deltangle != 50:
+            deltangle  += 10
+        else:
+            deltangle = 10
+
+        print( f'deltangle: {deltangle}')
+
+    if angle > 150:
+        angle = 150 + deltangle
+    if angle < 150:
+        angle = 150 - deltangle
 
     kitt.set_speed(speed)
     kitt.set_angle(angle)
