@@ -21,7 +21,7 @@ class main_tdoa:
             x5 = wavaudioread(root_folder / "utilities/data/Reference5.wav", Fs)
 
             mics = Audio() #callback = True?
-            data = mics.callback_data
+            data = mics.sample(N)
             samples = mics.split_data(data)
             
             T = TDOA()
