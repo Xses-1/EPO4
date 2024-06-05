@@ -16,8 +16,7 @@ class purePursuit:
         self.wheelbase = 0.335
         self.x_location = 0
         self.y_location = 0
-        self.lookAheadDistance = 0.1 # the radius of the circle us
-        self.fixedOrientation = 0.5*math.pi
+        self.lookAheadDistance = 0.5 # the radius of the circle
 
     def intersections(self, _location_x, _location_y, _x1, _y1, _x2, _y2):
         """_summary_
@@ -48,6 +47,7 @@ class purePursuit:
         elif len(_intersection.coords) == 1:
             return np.array([(_intersection.coords[0])])
         else:
+            print("nothing found")
             return [(0,0),(0, 0)]
     
     def steeringAngle(self, _x_tp, _y_tp, orientation):
@@ -60,9 +60,12 @@ class purePursuit:
         _   steering_angle: steering angle
         """
 
-        _alpha = np.arctan2((_x_tp - self.x_location), (_y_tp - self.y_location)) - orientation 
-        print(_alpha)
-        _angle = np.arctan((2 * self.wheelbase * np.sin(_alpha - np.radians(0.5*math.pi)))/self.lookAheadDistance)
+        _alpha = orientation - np.arctan2((_x_tp - self.x_location), (_y_tp - self.y_location))
+        
+        with open('test.txt', 'a') as f:
+            f.write(f' gamma = {_alpha}')
+            f.write(f' orientation = {orientation}')
+        _angle = np.arctan((2 * self.wheelbase * np.sin(_alpha))/self.lookAheadDistance)
 
         return _angle
 
@@ -92,13 +95,11 @@ class purePursuit:
             angle      : steering angle in radians
         """
         
-        self.intersection = self.intersections(_x_position, _y_position, _x_position, _y_position, _x_target, _y_target)
-        #self.intersection_2 = self.intersections(_x_position, _y_position, _x_position, _y_position, _x_target, _y_target)[1]
+        self.intersection = self.intersections(_x_position, _y_position, self.x_location, self.y_location, _x_target, _y_target)
 
         self.Target = self.point_selection(self.intersection[0], self.intersection[1], _x_target, _y_target)
 
         self.angle = self.steeringAngle(self.Target[0], self.Target[1], orientation)
-        #angle = purePursuit.steeringAngle(self, 
 
         return self.angle
 

@@ -30,7 +30,7 @@ class KITTmodel():
 
     def steering_state(self, phi, v):
         L = 0.335 #m            ## L is a constant and should just be stored internally
-        sin = np.sin(np.deg2rad(phi))
+        sin = np.tan(np.deg2rad(phi))
 
         if sin == 0:            ## avoid divide by 0 error
             return 0
@@ -39,7 +39,8 @@ class KITTmodel():
 
         d_theta = (v/R) # differential orientation
 
-        print(d_theta)
+        with open('test.txt', 'a') as f:
+            f.write(f' delta Theta = {d_theta}')
 
         return np.degrees(d_theta)
     
@@ -55,10 +56,12 @@ class KITTmodel():
 
                                                 ## intrinsic unit vector method
 
+        with open('test.txt', 'a') as f:
+            f.write(f' theta = {theta}')
         print(theta)
-        directionVector = np.array([[np.sin(np.deg2rad(theta))],
-                                   [np.cos(np.deg2rad(theta))]])
-
+        directionVector = np.array([[np.cos(np.deg2rad(theta))],
+                                   [np.sin(np.deg2rad(theta))]])
+        print(directionVector)
         self.position_state_vector += (directionVector * v * dt)
         
         return self.position_state_vector
@@ -83,7 +86,8 @@ class KITTmodel():
         
         self.position_state(v, Theta, dt)
 
-        print('\n \n')
+        with open('test.txt', 'a') as f:
+            f.write(f'\n \n')
 
         return self.position_state_vector, Theta
 

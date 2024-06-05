@@ -19,7 +19,7 @@ class PID:
         self.ForceKi = 0
         self.ForceKd = 0
 
-        self.AngleKp = -0.1
+        self.AngleKp = 1
         self.AngleKi = 0
         self.AngleKd = 0
         
@@ -29,17 +29,21 @@ class PID:
 
 
     def CalculateErrors(self, setpointx, setpointy, currx, curry, currentAngle):
-        x = setpointx - currx
-        y = setpointy - curry
+        x = currx - setpointx
+        y = curry - setpointy
         deltaP = np.sqrt((x)**2 + (y)**2)
 
         if deltaP != 0:
-            angle = np.angle(x + (y * 1j) , deg = True)
-            self.angle = angle                                                      ## Test Value
+            angle = np.degrees(np.arctan2(y,x))
+            self.angle = angle
+            print(angle)                                                   ## Test Value
             if angle < 0:
                 angle += 360
             deltaTheta1 = angle - currentAngle
             deltaTheta2 = angle + 180 - currentAngle
+
+            print(deltaTheta1)
+            print(deltaTheta2)
 
             if deltaTheta1 == 360:
                 deltaTheta1 = 0
@@ -93,6 +97,8 @@ class PID:
 
         Force = self.calculateForce(deltaP, deltaT)
         Angle = self.calculateAngle(deltaTheta, deltaT)
+        print(Angle)
+        print('\n')
 
         return Force, Angle
     

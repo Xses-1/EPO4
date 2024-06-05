@@ -10,8 +10,8 @@ from module4 import KITTmodel
 from PID import PID
 import purepursuit
 
-positionx = 1.0
-positiony = 1.0
+positionx = -1.0
+positiony = -1.0
 currentAngle = 90.0
 
 waittime = 10
@@ -34,6 +34,9 @@ angle = [90.0]
 Phis = [0]
 Thetas = [0]
 
+with open('test.txt', 'w') as f:
+    f.write(' empty run')
+
 for i in range(1,len(t)):
     dt = t[i] - t[i-1]
 
@@ -45,17 +48,20 @@ for i in range(1,len(t)):
 
     phi = np.degrees(pure.purepursuit(x[-1], y[-1], Setpointsx[i], Setpointsy[i], np.deg2rad(Theta)))
 
-    F,_ = Pid.Update(Setpointsx[i], Setpointsy[i], x[-1], y[-1], Theta, dt)
+    with open('test.txt', 'a') as f:
+        f.write(f' phi = {phi}')
+
+    F, _ = Pid.Update(Setpointsx[i], Setpointsy[i], x[-1], y[-1], Theta, dt)
+
     #print(Pid.angle , '  ', phi)
 
     Phis.append(phi)
 
-
 fig, ax = plt.subplots(2,2)
 fig.subplots_adjust(bottom=0.2, left = 0.1, top = 0.98, right = 0.99)
 
-line1, = ax[0][0].plot(y, x, lw=2, label = 'car position')
-line11, = ax[0][0].plot(Setpointsy, Setpointsx, label = 'car setpoint')
+line1, = ax[0][0].plot(x, y, lw=2, label = 'car position')
+line11, = ax[0][0].plot(Setpointsx, Setpointsy, label = 'car setpoint')
 ax[0][0].set_xlabel('X [m]')
 ax[0][0].set_ylabel('Y [m]')
 ax[0][0].set_ylim(-2,2)
