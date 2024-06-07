@@ -16,7 +16,6 @@ class purePursuit:
         self.wheelbase = 0.335
         self.x_location = 0
         self.y_location = 0
-        self.lookAheadDistance = 0.8 # the radius of the circle
 
     def intersections(self, _location_x, _location_y, _x1, _y1, _x2, _y2):
         """_summary_
@@ -36,6 +35,8 @@ class purePursuit:
             Returns:
                 _type_: array of intersection coordinates
         """
+        self.lookAheadDistance = 0.8*self.distance_calc(_x2, _y2, _x1, _y1) # the radius of the circle
+
         _point = Point(_location_x, _location_y)
         _circle = _point.buffer(self.lookAheadDistance)
         _path = LineString([(_x1, _y1), (_x2, _y2)])
