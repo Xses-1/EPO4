@@ -1,10 +1,13 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from module4 import KITTmodel
 import numpy as np
 import matplotlib.pyplot as plt
 
 t = np.linspace(0,20,400)
 KITT = KITTmodel()
-F_m = 1 #N
+F_m = 7.16 #N
 
 F = np.concatenate([[F_m] * 400])
 

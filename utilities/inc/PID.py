@@ -29,21 +29,14 @@ class PID:
 
 
     def CalculateErrors(self, setpointx, setpointy, currx, curry, currentAngle):
-        x = currx - setpointx
-        y = curry - setpointy
+        x = setpointx - currx
+        y = setpointy - curry
         deltaP = np.sqrt((x)**2 + (y)**2)
 
         if deltaP != 0:
-            angle = np.degrees(np.arctan2(y,x))
-            self.angle = angle
-            print(angle)                                                   ## Test Value
-            if angle < 0:
-                angle += 360
+            angle = np.arctan2(y,x)                                 
             deltaTheta1 = angle - currentAngle
-            deltaTheta2 = angle + 180 - currentAngle
-
-            print(deltaTheta1)
-            print(deltaTheta2)
+            deltaTheta2 = angle + np.pi - currentAngle
 
             if deltaTheta1 == 360:
                 deltaTheta1 = 0
@@ -56,7 +49,6 @@ class PID:
             else:
                 deltaTheta = deltaTheta2
                 deltaP = -deltaP
-
 
         else:
             return 0.0,0.0
@@ -97,8 +89,6 @@ class PID:
 
         Force = self.calculateForce(deltaP, deltaT)
         Angle = self.calculateAngle(deltaTheta, deltaT)
-        print(Angle)
-        print('\n')
 
         return Force, Angle
     
@@ -118,5 +108,8 @@ class PID:
 
     def AngletoPWM(self, Angle):
         return int(np.round(10/6 * Angle + 150, 0))
+    
+    def RadiansToPWM(self, Angle):
+        return int(np.round(300/np.pi * Angle + 150))
     
     
