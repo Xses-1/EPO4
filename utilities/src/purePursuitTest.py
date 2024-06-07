@@ -10,8 +10,8 @@ from module4 import KITTmodel
 from PID import PID
 import purepursuit
 
-positionx = -1.0
-positiony = -1.0
+positionx = 1.0
+positiony = 1.0
 currentAngle = 90.0
 
 waittime = 10

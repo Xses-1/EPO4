@@ -79,8 +79,10 @@ class purePursuit:
         _distance_2 = self.distance_calc(point_2[1], point_2[0], y_destination,
         x_destination)
         if _distance_1 <= _distance_2:
+            self.lookAheadDistance = 0.8 * _distance_1
             return point_1
         else:
+            self.lookAheadDistance = 0.8 * _distance_2
             return point_2
     
     def purepursuit(self, _x_position, _y_position, _x_target, _y_target, orientation):
