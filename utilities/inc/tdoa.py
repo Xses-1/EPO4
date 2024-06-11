@@ -61,10 +61,10 @@ class TDOA:
         tau15 = ((abs(h0).argmax() - abs(h4).argmax())*v/Fs)
 
         p1 = np.array([0, 0])       #define microphone positions
-        p2 = np.array([0, 4.80])
-        p3 = np.array([4.80, 4.80])
-        p4 = np.array([4.80, 0])
-        p5 = np.array([0, 2.40])
+        p2 = np.array([0, 4.60])
+        p3 = np.array([4.60, 4.60])
+        p4 = np.array([4.60, 0])
+        p5 = np.array([0, 2.30])
         
         A = np.array([[p1[0]-p2[0],p1[1]-p2[1],tau12],      
                       [p1[0]-p3[0],p1[1]-p3[1],tau13],
@@ -82,13 +82,13 @@ class TDOA:
         return B
 
     def closest_mic(self, X, Y):
-        if (X < 240) and (Y < 240):
+        if (X < 230) and (Y < 230):
             the_closest_mic = 1
 
-        elif (X < 240) and (Y > 240):
+        elif (X < 230) and (Y > 230):
             the_closest_mic = 2
 
-        elif (X > 240) and (Y > 240):
+        elif (X > 230) and (Y > 230):
             the_closest_mic = 3
 
         else:
