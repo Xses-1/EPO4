@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     # y = np.column_stack((y1,y2,y3,y4,y5))
 
-    y = wavaudioread(root_folder / "utilities/data/record_x150_y185.wav", Fs)
+    y = wavaudioread(root_folder / "utilities/data/record_x64_y40.wav", Fs)
 
     x = wavaudioread(root_folder / "utilities/data/reference.wav", Fs)    #Using reference recordings from all microphones
     
@@ -40,6 +40,6 @@ if __name__ == '__main__':
     c = T.localization(x1,x2,x3,x4,x5, y, Fs)
     print(c)
 
-    error = np.sqrt((1.43-c[0])**2+(2.96-c[1])**2)
+    error = np.sqrt((.64-c[0])**2+(.40-c[1])**2)
 
     print(error)
