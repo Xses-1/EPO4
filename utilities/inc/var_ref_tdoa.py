@@ -59,14 +59,14 @@ class TDOA:
             return h0, h1, h2, h3, h4
         
         def closest_mic(h0,h1,h2,h3):
-            distances = np.array([[abs(h0).argmax()], [abs(h1).argmax()], [abs(h2).argmax()], [abs(h3).argmax()]])
-            min_pos = np.argmin(distances) + 1
-
+            distances = np.array([[abs(h0).argmax()], [abs(h1).argmax()], [abs(h2).argmax()], [abs(h3).argmax()]]) #array of all peaks
+            min_pos = np.argmin(distances) + 1  #takes the indice of peak with the lowest sample number, adds 1 to get the corresponding mic number
+            #print(min_pos)
             return min_pos
 
         def matrix_calc(h0,h1,h2,h3,h4,cl_mic):
             v = 343.21      #speed of sound
-            p1 = np.array([0, 0])       #define microphone positions
+            p1 = np.array([0, 0])       #define microphone positions ####PAY ATTENTION TO 480/460###
             p2 = np.array([0, 4.80])
             p3 = np.array([4.80, 4.80])
             p4 = np.array([4.80, 0])
@@ -143,9 +143,9 @@ class TDOA:
             
             #print(B)
             return B
-        d = channel_estimate(x1,x2,x3,x4,x5,y,Fs)
-        cl_mic = closest_mic(d[0],d[1],d[2],d[3])
-        coordinates = matrix_calc(d[0],d[1],d[2],d[3],d[4],cl_mic)
+        d = channel_estimate(x1,x2,x3,x4,x5,y,Fs)       #makes the channel estimates for each mic
+        cl_mic = closest_mic(d[0],d[1],d[2],d[3])       #finds the reference mic
+        coordinates = matrix_calc(d[0],d[1],d[2],d[3],d[4],cl_mic)  #does the matrix calculation taking into account the reference mic
         return coordinates
     
     def tdoa_input(self,mic1,mic2,mic3,mic4,mic5): 
