@@ -109,10 +109,10 @@ class TDOA:
         tau25 = ((abs(h1).argmax() - abs(h4).argmax())*v/Fs)
 
         p1 = np.array([0, 0])       #define microphone positions
-        p2 = np.array([0, 4.80])
-        p3 = np.array([4.80, 4.80])
-        p4 = np.array([4.80, 0])
-        p5 = np.array([0, 2.40])
+        p2 = np.array([0, 4.60])
+        p3 = np.array([4.60, 4.60])
+        p4 = np.array([4.60, 0])
+        p5 = np.array([0, 2.30])
         
         A = np.array([[p2[0]-p1[0],p2[1]-p1[1],tau21],      
                       [p2[0]-p3[0],p2[1]-p3[1],tau23],
@@ -158,10 +158,10 @@ class TDOA:
         tau35 = ((abs(h2).argmax() - abs(h4).argmax())*v/Fs)
 
         p1 = np.array([0, 0])       #define microphone positions
-        p2 = np.array([0, 4.80])
-        p3 = np.array([4.80, 4.80])
-        p4 = np.array([4.80, 0])
-        p5 = np.array([0, 2.40])
+        p2 = np.array([0, 4.60])
+        p3 = np.array([4.60, 4.60])
+        p4 = np.array([4.60, 0])
+        p5 = np.array([0, 2.30])
         
         A = np.array([[p3[0]-p1[0],p3[1]-p1[1],tau31],      
                       [p3[0]-p2[0],p3[1]-p2[1],tau32],
@@ -207,10 +207,10 @@ class TDOA:
         tau45 = ((abs(h3).argmax() - abs(h4).argmax())*v/Fs)
 
         p1 = np.array([0, 0])       #define microphone positions
-        p2 = np.array([0, 4.80])
-        p3 = np.array([4.80, 4.80])
-        p4 = np.array([4.80, 0])
-        p5 = np.array([0, 2.40])
+        p2 = np.array([0, 4.60])
+        p3 = np.array([4.60, 4.60])
+        p4 = np.array([4.60, 0])
+        p5 = np.array([0, 2.30])
         
         A = np.array([[p4[0]-p1[0],p4[1]-p1[1],tau41],      
                       [p4[0]-p2[0],p4[1]-p2[1],tau42],
