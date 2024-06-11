@@ -10,9 +10,6 @@ from var_ref_tdoa import TDOA
 if __name__ == '__main__':
     T = TDOA()
 
-    
-
-
     #y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
 
     Fs = 44100
