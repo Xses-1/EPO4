@@ -59,7 +59,7 @@ class KITTmodel():
     
     def update_Theta(self, phi, v, dt):
         self.theta += (self.steering_state(phi, v) * dt)
-        if self.theta >= 2 * np.pi:
+        if self.theta >= np.pi:
             self.theta -= 2 * np.pi
         return self.theta
     
