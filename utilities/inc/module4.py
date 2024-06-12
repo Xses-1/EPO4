@@ -1,8 +1,4 @@
 import numpy as np
-import time
-import matplotlib.pyplot as plt
-import control as ct
-import control.matlab as matlab
 
 class KITTmodel():
     def __init__(self): ## Should probably input the starting position and shit
