@@ -6,7 +6,7 @@ from pathlib import Path
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from wavaudioread import wavaudioread
 from Audio import Audio 
-from tdoa import TDOA
+from var_ref_tdoa import TDOA
 
 if __name__ == '__main__':
     mics = Audio()
@@ -29,3 +29,7 @@ if __name__ == '__main__':
 
     c = T.localization(x1,x2,x3,x4,x5, y, Fs)
     print(c)
+
+    error = np.sqrt((3.25-c[0])**2+(1.60-c[1])**2)
+
+    print(error)

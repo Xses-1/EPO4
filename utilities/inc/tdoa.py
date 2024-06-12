@@ -50,10 +50,10 @@ class TDOA:
         y = y[len(y)-25000:]            #crop y to the last pulse(s)
 
         h0 = self.ch3(x1, y[:, 0], Lhat1, epsi)     #create the channel estimates for all microphones
-        h1 = self.ch3(x2, y[:, 1], Lhat2, epsi)
-        h2 = self.ch3(x3, y[:, 2], Lhat3, epsi)
-        h3 = self.ch3(x4, y[:, 3], Lhat4, epsi)
-        h4 = self.ch3(x5, y[:, 4], Lhat5, epsi)
+        h1 = self.ch3(x1, y[:, 1], Lhat2, epsi)
+        h2 = self.ch3(x1, y[:, 2], Lhat3, epsi)
+        h3 = self.ch3(x1, y[:, 3], Lhat4, epsi)
+        h4 = self.ch3(x1, y[:, 4], Lhat5, epsi)
 
         tau12 = ((abs(h0).argmax() - abs(h1).argmax())*v/Fs) #calculate the difference between peaks
         tau14 = ((abs(h0).argmax() - abs(h3).argmax())*v/Fs) #in the channel estimates
@@ -61,10 +61,10 @@ class TDOA:
         tau15 = ((abs(h0).argmax() - abs(h4).argmax())*v/Fs)
 
         p1 = np.array([0, 0])       #define microphone positions
-        p2 = np.array([0, 4.80])
-        p3 = np.array([4.80, 4.80])
-        p4 = np.array([4.80, 0])
-        p5 = np.array([0, 2.40])
+        p2 = np.array([0, 4.60])
+        p3 = np.array([4.60, 4.60])
+        p4 = np.array([4.60, 0])
+        p5 = np.array([0, 2.30])
         
         A = np.array([[p1[0]-p2[0],p1[1]-p2[1],tau12],      
                       [p1[0]-p3[0],p1[1]-p3[1],tau13],
