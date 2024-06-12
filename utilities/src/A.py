@@ -9,13 +9,13 @@ from KITT import KITT
 #from Audio import Audio
 from module4 import KITTmodel
 from PID import PID
-# from purepursuit import purePursuit
+from purepursuit import purePursuit
 # from tdoa import TDOA
 
 
 
 # Define static variables
-target_offset = 0.1          # The distance from the tarrget to still count success
+target_offset = 0.6          # The distance from the tarrget to still count success
 calibration_delay = 100     # The amount of loop iterations before the TDOA calibration
 size_of_the_field = 4.80     # It's a square
 run_time  = 0.00000000000000000000000000000000000000000000000000000019
@@ -46,6 +46,7 @@ else:
 kittmodel = KITTmodel()
 kitt = KITT(comPort)
 pid = PID()
+pps = purePursuit()
 
 
 # Checking the initial position (c for current)
@@ -57,7 +58,7 @@ pid = PID()
 print("Type in the current position in meters and angle")
 cX = float(input())
 cY = float(input())
-Theta = np.pi*float(input())
+Theta = np.pi/2*float(input())
 
 kittmodel.position_state_vector = np.array([[cX],[cY]])
 kittmodel.theta = Theta
@@ -67,9 +68,18 @@ i = 0
 while(1):
     # Getting the PWMs to move the car to the correct direction
     F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
+    #pwmMotor    = pid.ForceToPWM(F)
+    pwmSteering = pid.RadiansToPWM(phi)
+    pwmMotor    = 160 # Can be fixed for testing
+
+    '''
+    # Getting the PWMs to move the car with the Pure Pursuit
+    F, _ = pid.Update(tX, tY, cX, cY, Theta, run_time)
+    phi = pps.purepursuit(cX, cY, tX, tY, Theta) 
     # pwmMotor    = pid.forcePID(Theta, run_time, tX, tY, cX, cY)
     pwmSteering = pid.RadiansToPWM(phi)
     pwmMotor    = 160 # Can be fixed for testing
+    '''
 
     # Get the time when the car started to move
     time_old = time.monotonic()
@@ -83,16 +93,22 @@ while(1):
 
     # Calcualting the current position of the car with the model
     run_time = time.monotonic() - time_old
-    position_Vector, theta = kittmodel.update(phi, 4.06, run_time)
+    position_Vector, Theta = kittmodel.update(phi, 4.06, run_time)
     cX = position_Vector[0][0]
     cY = position_Vector[1][0]
 
+    '''
     print("Time: ")
     print(run_time)
+    '''
     print("CX, CY: ")
     print(cX, cY)
+    '''
     print("Phi, F: ")
     print(phi, F)
+    print("PMWs: ")
+    print(pwmSteering, pwmMotor)
+    '''
     print()
 
 
