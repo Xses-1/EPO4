@@ -1,9 +1,6 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.io import wavfile
 from scipy.fft import fft, ifft
-from scipy.signal import convolve, unit_impulse
-from scipy import linalg
 
 import samplerate
 from scipy.io import wavfile
@@ -35,18 +32,9 @@ class TDOA:
     def localization(self, x1,x2,x3,x4,x5, y, Fs):
         def channel_estimate(x1,x2,x3,x4,x5,y,Fs):
             epsi = 0.01     #threshold value used in ch3
-            v = 343.21      #speed of sound
             Lhat1 = len(y) - len(x1) + 1    #equal length of x and y 
-            Lhat2 = len(y) - len(x2) + 1
-            Lhat3 = len(y) - len(x3) + 1
-            Lhat4 = len(y) - len(x4) + 1
-            Lhat5 = len(y) - len(x5) + 1
     
             x1 = x1[len(x1)-25000:]         #crop x to the last pulse(s)
-            x2 = x2[len(x2)-25000:]
-            x3 = x3[len(x3)-25000:]
-            x4 = x4[len(x4)-25000:]
-            x5 = x5[len(x5)-25000:]
 
             y = y[len(y)-25000:]            #crop y to the last pulse(s)
 
