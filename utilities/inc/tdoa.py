@@ -1,4 +1,3 @@
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
@@ -33,54 +32,63 @@ class TDOA:
 
         return h
 
-    def localization(self, x, y, Fs):
-        epsi = 0.01
-        v = 343.21
-        Lhat = len(y) - len(x) + 1
+    def localization(self, x1,x2,x3,x4,x5, y, Fs):
+        epsi = 0.01     #threshold value used in ch3
+        v = 343.21      #speed of sound
+        Lhat1 = len(y) - len(x1) + 1    #equal length of x and y 
+        Lhat2 = len(y) - len(x2) + 1
+        Lhat3 = len(y) - len(x3) + 1
+        Lhat4 = len(y) - len(x4) + 1
+        Lhat5 = len(y) - len(x5) + 1
     
-        x = x[len(x)-25000:]
-        y = y[len(y)-25000:]
+        x1 = x1[len(x1)-25000:]         #crop x to the last pulse(s)
+        x2 = x2[len(x2)-25000:]
+        x3 = x3[len(x3)-25000:]
+        x4 = x4[len(x4)-25000:]
+        x5 = x5[len(x5)-25000:]
 
-        h0 = self.ch3(x, y[:, 0], Lhat, epsi)
-        h1 = self.ch3(x, y[:, 1], Lhat, epsi)
-        h2 = self.ch3(x, y[:, 2], Lhat, epsi)
-        h3 = self.ch3(x, y[:, 3], Lhat, epsi)
-        h4 = self.ch3(x, y[:, 4], Lhat, epsi)
+        y = y[len(y)-25000:]            #crop y to the last pulse(s)
 
-        tau12 = ((abs(h0).argmax() - abs(h1).argmax())*v/Fs)
-        tau14 = ((abs(h0).argmax() - abs(h3).argmax())*v/Fs)
+        h0 = self.ch3(x1, y[:, 0], Lhat1, epsi)     #create the channel estimates for all microphones
+        h1 = self.ch3(x1, y[:, 1], Lhat2, epsi)
+        h2 = self.ch3(x1, y[:, 2], Lhat3, epsi)
+        h3 = self.ch3(x1, y[:, 3], Lhat4, epsi)
+        h4 = self.ch3(x1, y[:, 4], Lhat5, epsi)
+
+        tau12 = ((abs(h0).argmax() - abs(h1).argmax())*v/Fs) #calculate the difference between peaks
+        tau14 = ((abs(h0).argmax() - abs(h3).argmax())*v/Fs) #in the channel estimates
         tau13 = ((abs(h0).argmax() - abs(h2).argmax())*v/Fs)
         tau15 = ((abs(h0).argmax() - abs(h4).argmax())*v/Fs)
 
-        x1 = np.array([0, 0])
-        x2 = np.array([0, 4.80])
-        x3 = np.array([4.80, 4.80])
-        x4 = np.array([4.80, 0])
-        x5 = np.array([0, 2.40])
+        p1 = np.array([0, 0])       #define microphone positions
+        p2 = np.array([0, 4.60])
+        p3 = np.array([4.60, 4.60])
+        p4 = np.array([4.60, 0])
+        p5 = np.array([0, 2.30])
         
-        A = np.array([[x1[0]-x2[0],x1[1]-x2[1],tau12],
-                      [x1[0]-x3[0],x1[1]-x3[1],tau13],
-                      [x1[0]-x4[0],x1[1]-x4[1],tau14],
-                      [x1[0]-x5[0],x1[1]-x5[1],tau15]])
+        A = np.array([[p1[0]-p2[0],p1[1]-p2[1],tau12],      
+                      [p1[0]-p3[0],p1[1]-p3[1],tau13],
+                      [p1[0]-p4[0],p1[1]-p4[1],tau14],
+                      [p1[0]-p5[0],p1[1]-p5[1],tau15]])
         
-        C = np.array([[0.5*(x1[0]**2-x2[0]**2+x1[1]**2-x2[1]**2+tau12**2)],
-                      [0.5*(x1[0]**2-x3[0]**2+x1[1]**2-x3[1]**2+tau13**2)],
-                      [0.5*(x1[0]**2-x4[0]**2+x1[1]**2-x4[1]**2+tau14**2)],
-                      [0.5*(x1[0]**2-x5[0]**2+x1[1]**2-x5[1]**2+tau15**2)]])
+        C = np.array([[0.5*(p1[0]**2-p2[0]**2+p1[1]**2-p2[1]**2+tau12**2)],
+                      [0.5*(p1[0]**2-p3[0]**2+p1[1]**2-p3[1]**2+tau13**2)],
+                      [0.5*(p1[0]**2-p4[0]**2+p1[1]**2-p4[1]**2+tau14**2)],
+                      [0.5*(p1[0]**2-p5[0]**2+p1[1]**2-p5[1]**2+tau15**2)]])
 
-        B = np.linalg.lstsq(A, C, rcond=None)[0][:2].flatten()
+        B = np.linalg.lstsq(A, C, rcond=None)[0][:2].flatten()  #matrix calculation to get coordinates
 
         #print(B)
         return B
 
     def closest_mic(self, X, Y):
-        if (X < 240) and (Y < 240):
+        if (X < 230) and (Y < 230):
             the_closest_mic = 1
 
-        elif (X < 240) and (Y > 240):
+        elif (X < 230) and (Y > 230):
             the_closest_mic = 2
 
-        elif (X > 240) and (Y > 240):
+        elif (X > 230) and (Y > 230):
             the_closest_mic = 3
 
         else:
@@ -118,6 +126,6 @@ class TDOA:
 
     def tdoa_input(self,mic1,mic2,mic3,mic4,mic5): 
         b = []
-        b = np.stack((mic1, mic2, mic3, mic4, mic5), axis =-1)
-
+        b = np.stack((mic1, mic2, mic3, mic4, mic5), axis =-1) #takes input arrays and stacks them in a 3d array
+                                                               #with each column containing a different microphone
         return b

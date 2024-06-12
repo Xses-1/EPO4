@@ -1,4 +1,3 @@
-*.csv
 *.pyc
 *.wav
 *.out
@@ -6,3 +5,4 @@
 *.csv
 utilities/inc/test.txt
 *.txt
+.vscode
