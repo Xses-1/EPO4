@@ -11,7 +11,7 @@ from PID import PID
 import purepursuit
 
 positionx = -1.0
-positiony = 1.0
+positiony = 1.5
 
 waittime = 10
 movetime = 190
@@ -43,8 +43,6 @@ for i in range(1,len(t)):
     x.append(position_Vector[0][0])
     y.append(position_Vector[1][0])
     Thetas.append(Theta)
-
-    _ = pure.purepursuit(x[-1], y[-1], Setpointsx[i], Setpointsy[i], Theta)
 
     F, phi = Pid.Update(Setpointsx[i], Setpointsy[i], x[-1], y[-1], Theta, dt)
 
