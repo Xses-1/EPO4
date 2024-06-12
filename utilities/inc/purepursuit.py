@@ -35,8 +35,6 @@ class purePursuit:
             Returns:
                 _type_: array of intersection coordinates
         """
-        self.lookAheadDistance = 0.8*self.distance_calc(_x2, _y2, _x1, _y1) # the radius of the circle
-
         _point = Point(_location_x, _location_y)
         _circle = _point.buffer(self.lookAheadDistance)
         _path = LineString([(_x1, _y1), (_x2, _y2)])
@@ -49,7 +47,7 @@ class purePursuit:
             return np.array([(_intersection.coords[0])])
         else:
             print("nothing found")
-            return [(0,0),(0, 0)]
+            return  np.array([(0,0), (0,0)])
     
     def steeringAngle(self, _x_tp, _y_tp, orientation):
         """deterimines the steering angle for kitt based on the target point
@@ -80,10 +78,8 @@ class purePursuit:
         _distance_2 = self.distance_calc(point_2[1], point_2[0], y_destination,
         x_destination)
         if _distance_1 <= _distance_2:
-            self.lookAheadDistance = 0.8 * _distance_1
             return point_1
         else:
-            self.lookAheadDistance = 0.8 * _distance_2
             return point_2
     
     def purepursuit(self, _x_position, _y_position, _x_target, _y_target, orientation):
@@ -97,13 +93,18 @@ class purePursuit:
         Returns:
             angle      : steering angle in radians
         """
-        
-        self.intersection = self.intersections(_x_position, _y_position, self.x_location, self.y_location, _x_target, _y_target)
-
+        for multiplier in np.linspace(0.1, 2, 20):
+            self.lookAheadDistance = multiplier * self.distance_calc(_x_target, _y_target, _x_position, _y_position) # the radius of the circle
+            self.intersection = self.intersections(_x_position, _y_position, self.x_location, self.y_location, _x_target, _y_target)
+            #print(self.intersection.shape())
+            if self.intersection[0,0] == 0 and self.intersection[1,1] == 0 and self.intersection[1,0] == 0 and self.intersection[0,1] == 0:
+                continue
+            else:
+                break
+        with open('test.txt', 'a') as f:
+            f.write(f'intersections: {self.intersection}')
         self.Target = self.point_selection(self.intersection[0], self.intersection[1], _x_target, _y_target)
 
         self.angle = self.steeringAngle(self.Target[0], self.Target[1], orientation)
 
         return self.angle
-
-    
