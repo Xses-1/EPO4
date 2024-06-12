@@ -44,8 +44,6 @@ for i in range(1,len(t)):
     y.append(position_Vector[1][0])
     Thetas.append(Theta)
 
-    _ = pure.purepursuit(x[-1], y[-1], Setpointsx[i], Setpointsy[i], Theta)
-
     F, phi = Pid.Update(Setpointsx[i], Setpointsy[i], x[-1], y[-1], Theta, dt)
 
     #print(Pid.angle , '  ', phi)

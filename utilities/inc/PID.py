@@ -10,7 +10,7 @@ class PID:
         self.LastdistError = 0
 
         self.maxForce = 7.16
-        self.maxAngle = 30
+        self.maxAngle = 0.523599
         
         self.ForceList  = [7.16,4.06,0.49,0,-1,47,-3.38,-7.16]
         self.PWMList    = [165,160,156,150,145,140,135]
@@ -38,10 +38,10 @@ class PID:
             deltaTheta1 = angle - currentAngle
             deltaTheta2 = angle + np.pi - currentAngle
 
-            if deltaTheta1 == 360:
-                deltaTheta1 = 0
-            if deltaTheta2 == 360:
-                deltaTheta2 = 0
+            if deltaTheta1 >= 2 * np.pi:
+                deltaTheta1 -= 2 * np.pi
+            if deltaTheta2 >= 2 * np.pi:
+                deltaTheta2 -= 2 * np.pi
             
             
             if deltaTheta1 <= deltaTheta2:
@@ -52,6 +52,7 @@ class PID:
 
         else:
             return 0.0,0.0
+        
         return deltaP, deltaTheta
     
     def calculateForce(self, deltaP, deltaT):
