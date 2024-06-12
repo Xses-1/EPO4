@@ -113,6 +113,6 @@ class PID:
         return int(np.round(10/6 * Angle + 150, 0))
     
     def RadiansToPWM(self, Angle):
-        return int(np.round(300/np.pi * Angle + 150))
+        return int(np.round(200/np.pi * Angle + 150))
     
     
