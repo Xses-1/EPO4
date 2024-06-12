@@ -13,7 +13,7 @@ positionx = 1.0
 positiony = 1.0
 currentAngle = 90.0
 
-waittime = 10
+waittime = 10   
 movetime = 190
 t = np.linspace(0,10,200)
 Setpointsx = np.concatenate([np.zeros(waittime), [positionx] * movetime])

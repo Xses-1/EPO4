@@ -10,7 +10,7 @@ class PID:
         self.LastdistError = 0
 
         self.maxForce = 7.16
-        self.maxAngle = 30
+        self.maxAngle = 0.523599
         
         self.ForceList  = [7.16,4.06,0.49,0,-1,47,-3.38,-7.16]
         self.PWMList    = [165,160,156,150,145,140,135]
@@ -19,7 +19,7 @@ class PID:
         self.ForceKi = 0
         self.ForceKd = 0
 
-        self.AngleKp = -0.1
+        self.AngleKp = 1
         self.AngleKi = 0
         self.AngleKd = 0
         
@@ -34,17 +34,14 @@ class PID:
         deltaP = np.sqrt((x)**2 + (y)**2)
 
         if deltaP != 0:
-            angle = np.angle(x + (y * 1j) , deg = True)
-            self.angle = angle                                                      ## Test Value
-            if angle < 0:
-                angle += 360
+            angle = np.arctan2(y,x)                                 
             deltaTheta1 = angle - currentAngle
-            deltaTheta2 = angle + 180 - currentAngle
+            deltaTheta2 = angle + np.pi - currentAngle
 
-            if deltaTheta1 == 360:
-                deltaTheta1 = 0
-            if deltaTheta2 == 360:
-                deltaTheta2 = 0
+            if deltaTheta1 >= 2 * np.pi:
+                deltaTheta1 -= 2 * np.pi
+            if deltaTheta2 >= 2 * np.pi:
+                deltaTheta2 -= 2 * np.pi
             
             
             if deltaTheta1 <= deltaTheta2:
@@ -53,9 +50,9 @@ class PID:
                 deltaTheta = deltaTheta2
                 deltaP = -deltaP
 
-
         else:
             return 0.0,0.0
+        
         return deltaP, deltaTheta
     
     def calculateForce(self, deltaP, deltaT):
@@ -112,5 +109,8 @@ class PID:
 
     def AngletoPWM(self, Angle):
         return int(np.round(10/6 * Angle + 150, 0))
+    
+    def RadiansToPWM(self, Angle):
+        return int(np.round(300/np.pi * Angle + 150))
     
     
