@@ -14,8 +14,8 @@ positionx = -1.0
 positiony = 1.5
 
 waittime = 10
-movetime = 190
-t = np.linspace(0,10,200)
+movetime = 390
+t = np.linspace(0,20,400)
 Setpointsx = np.concatenate([np.zeros(waittime), [positionx] * movetime])
 Setpointsy = np.concatenate([np.zeros(waittime), [positiony] * movetime])
 

@@ -1,8 +1,4 @@
 import numpy as np
-import time
-import matplotlib.pyplot as plt
-import control as ct
-import control.matlab as matlab
 
 class KITTmodel():
     def __init__(self): ## Should probably input the starting position and shit
@@ -63,7 +59,7 @@ class KITTmodel():
     
     def update_Theta(self, phi, v, dt):
         self.theta += (self.steering_state(phi, v) * dt)
-        if self.theta >= 2 * np.pi:
+        if self.theta >= np.pi:
             self.theta -= 2 * np.pi
         return self.theta
     

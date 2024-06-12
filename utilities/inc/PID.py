@@ -1,4 +1,3 @@
-from module4 import KITTmodel
 import numpy as np
 
 class PID:
@@ -37,11 +36,13 @@ class PID:
             angle = np.arctan2(y,x)                                 
             deltaTheta1 = angle - currentAngle
             deltaTheta2 = angle + np.pi - currentAngle
+            print(angle)
 
-            if deltaTheta1 >= 2 * np.pi:
-                deltaTheta1 -= 2 * np.pi
-            if deltaTheta2 >= 2 * np.pi:
-                deltaTheta2 -= 2 * np.pi
+
+            #if deltaTheta1 >=  np.pi:
+            #    deltaTheta1 -= 2 * np.pi
+            #if deltaTheta2 >=  np.pi:
+            #    deltaTheta2 -= 2 * np.pi
             
             
             if deltaTheta1 <= deltaTheta2:
@@ -50,6 +51,7 @@ class PID:
                 deltaTheta = deltaTheta2
                 deltaP = -deltaP
 
+            print(f'deltaP = {deltaP}, deltaTheta = {deltaTheta}')
         else:
             return 0.0,0.0
         
