@@ -8,13 +8,15 @@ class PID:
         self.distIntegral = 0
         self.LastdistError = 0
 
+        self.minForce = 1.03
         self.maxForce = 8.91
+        self.minAngle = 0.0872665
         self.maxAngle = 0.349066
         
-        self.ForceList  = [8.91,4.992,1.04,0,-2.71,-6.24,-9.984]
-        self.PWMList    = [165,160,156,150,145,140,135]
+        self.ForceList  = [8.91,4.992,1.04,0,0,0,-2.71,-6.24,-9.984]
+        self.PWMList    = [165,160,156,155,150,145,146,140,135]
 
-        self.ForceKp = 2
+        self.ForceKp = 0.8
         self.ForceKi = 0
         self.ForceKd = 0
 
@@ -33,17 +35,19 @@ class PID:
         deltaP = np.sqrt((x)**2 + (y)**2)
 
         if deltaP > 0.05:
-            angle = np.arctan2(y,x)                                 
+            angle = np.arctan2(y,x)        
+            print(angle)                         
             deltaTheta = angle - currentAngle
 
+            print(f'delta:{deltaTheta}')
             if abs(deltaTheta) > np.pi:
-                deltaTheta = (np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
+                deltaTheta = -(np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
             
             if abs(deltaTheta) > np.pi/2:
                 deltaP = -deltaP
                 deltaTheta = (np.sign(deltaTheta) * np.pi) + deltaTheta
 
-            #print(f'deltaP = {deltaP}, deltaTheta = {deltaTheta}')
+            print(f'deltaP = {deltaP}, deltaTheta = {deltaTheta}')
         else:
             return 0.0,0.0
         
@@ -63,6 +67,13 @@ class PID:
         if abs(Force) > self.maxForce:
             Force = np.sign(Force) * self.maxForce
 
+        if abs(Force) < 0.01:
+            Force = 0
+        elif abs(Force) > self.maxForce:
+            Force = np.sign(Force) * self.maxForce
+        elif abs(Force) < self.minForce:
+            Force = np.sign(Force) * self.minForce
+
         #print(f'Force : {Force}')
 
         return Force
@@ -75,8 +86,12 @@ class PID:
 
         Angle = (self.AngleKp * deltaTheta) + (self.AngleKi * self.angleIntegral) + (self.AngleKd * angleDiff)
 
-        if abs(Angle) > self.maxAngle:
+        if abs(Angle) < 0.0174533:
+            Angle = 0
+        elif abs(Angle) > self.maxAngle:
             Angle = np.sign(Angle) * self.maxAngle
+        elif abs(Angle) < self.minAngle:
+            Angle = np.sign(Angle) * self.minAngle
 
         return Angle
     
