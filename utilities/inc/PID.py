@@ -8,13 +8,13 @@ class PID:
         self.distIntegral = 0
         self.LastdistError = 0
 
-        self.maxForce = 7.16
+        self.maxForce = 8.91
         self.maxAngle = 0.349066
         
-        self.ForceList  = [8.91,4.992,0,-1.47,-3.38,-7.16]
+        self.ForceList  = [8.91,4.992,1.04,0,-2.71,-6.24,-9.984]
         self.PWMList    = [165,160,156,150,145,140,135]
 
-        self.ForceKp = 1
+        self.ForceKp = 0.8
         self.ForceKi = 0
         self.ForceKd = 0
 
