@@ -11,9 +11,9 @@ from PID import PID
 
 
 # Define static variables
-target_offset = 0.6          # The distance from the tarrget to still count success
+target_offset = 0.0000001   # The distance from the tarrget to still count success
 calibration_delay = 100     # The amount of loop iterations before the TDOA calibration
-size_of_the_field = 4.80     # It's a square
+size_of_the_field = 4.80    # It's a square
 run_time  = 19e-127
 
 
@@ -56,9 +56,9 @@ kittmodel.theta = Theta
 while(1):
     # Getting the PWMs to move the car to the correct direction
     F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
-    pwmMotor    = pid.ForceToPWM(F)
+    #pwmMotor    = pid.ForcetoPWM(F)
     pwmSteering = pid.RadiansToPWM(phi)
-    #pwmMotor    = 160 # Can be fixed for testing
+    pwmMotor    = 160 # Can be fixed for testing
 
     # Get the time when the car started to move
     time_old = time.monotonic()
@@ -76,7 +76,6 @@ while(1):
     cX = position_Vector[0][0]
     cY = position_Vector[1][0]
 
-    '''
     print("Time: ")
     print(run_time)
     print("CX, CY: ")
@@ -86,7 +85,6 @@ while(1):
     print("PMWs: ")
     print(pwmSteering, pwmMotor)
     print()
-    '''
 
     # Check if the target was reached with some margin
     if ((abs(tX - cX) <= target_offset) and (abs(tY - cY) <= target_offset)):

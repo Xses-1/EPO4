@@ -92,7 +92,7 @@ class PID:
 
 
     def ForcetoPWM(self, Force):
-        for i in range(1,self.ForceList):
+        for i in range(1,len(self.ForceList)):
             if self.ForceList[i-1] <= Force <= self.ForceList[i]:
                 PWM1 = self.PWMList[i-1]
                 PWM2 = self.PWMList[i]
@@ -101,7 +101,7 @@ class PID:
                 break
 
 
-        return int(np.round((PWM2 - PWM1)/(Force2 - Force1) (Force - Force1) + PWM1,))
+        return int(np.round(((PWM2 - PWM1)/(Force2 - Force1)) * (Force - Force1) + PWM1,))
 
     def AngletoPWM(self, Angle):
         return int(np.round(10/6 * Angle + 150, 0))

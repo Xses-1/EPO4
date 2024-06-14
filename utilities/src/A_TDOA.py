@@ -118,10 +118,10 @@ while(1):
     print(cX, cY)
     print("Phi, F: ")
     print(phi, F)
+    '''
     print("PMWs: ")
     print(pwmSteering, pwmMotor)
     print()
-    '''
 
 
     # Calibrate the current position any other time

@@ -197,13 +197,13 @@ class KITT:
             speed += 15
 
         if keyboard.is_pressed('left') or keyboard.is_pressed('a'):
-            angle += 50
+            angle += 35
 
         if keyboard.is_pressed('down') or keyboard.is_pressed('s'):
             speed -= 15
 
         if keyboard.is_pressed('right') or keyboard.is_pressed('d'):
-            angle -= 50
+            angle -= 35
 
         if keyboard.is_pressed('q'):
             self.startBeacon()
