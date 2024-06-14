@@ -97,7 +97,7 @@ i = 0
 while(1):
     # Getting the PWMs to move the car to the correct direction
     F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
-    pwmMotor    = pid.ForceToPWM(F)
+    pwmMotor    = pid.ForcetoPWM(F)
     pwmSteering = pid.RadiansToPWM(phi)
     #pwmMotor    = 160 # Can be fixed for testing
 
@@ -114,6 +114,7 @@ while(1):
     # Calcualting the current position of the car with the model
     run_time = time.monotonic() - time_old
     position_Vector, Theta = kittmodel.update(phi, 4.06, run_time)
+    print(Theta)
     cX = position_Vector[0][0]
     cY = position_Vector[1][0]
 
@@ -132,12 +133,12 @@ while(1):
 
 
     # Calibrate the current position any other time
-    if (i == 50):
+    if (i == 30):
         # Stop the car
-        pwmSteering = 150
+        #pwmSteering = 150
         pwmMotor    = 150
         kitt.set_speed(pwmMotor)
-        kitt.set_angle(pwmSteering)
+        #kitt.set_angle(pwmSteering)
 
         # Wait utill it actually stops
         time.sleep(1)

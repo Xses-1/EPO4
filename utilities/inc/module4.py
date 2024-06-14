@@ -7,7 +7,7 @@ class KITTmodel():
         self.position_state_vector = np.array([[0.0],[0.0]])       ## x,y
         self.theta = np.pi/2
 
-        self.maxPhi = 0.523599
+        self.maxPhi = 0.349066
         self.maxForce = 7.16
 
 
