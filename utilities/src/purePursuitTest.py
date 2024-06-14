@@ -11,7 +11,7 @@ from PID import PID
 import purepursuit
 
 positionx = 2.0
-positiony = -3.0
+positiony = 2.0
 
 waittime = 10
 movetime = 390
