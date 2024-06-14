@@ -131,6 +131,8 @@ class TDOA:
             
             #print(B)
             return B
+
+
         d = channel_estimate(x1,x2,x3,x4,x5,y,Fs)       #makes the channel estimates for each mic
         cl_mic = closest_mic(d[0],d[1],d[2],d[3])       #finds the reference mic
         coordinates = matrix_calc(d[0],d[1],d[2],d[3],d[4],cl_mic)  #does the matrix calculation taking into account the reference mic

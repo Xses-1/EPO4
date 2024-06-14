@@ -107,4 +107,7 @@ class purePursuit:
 
         self.angle = self.steeringAngle(self.Target[0], self.Target[1], orientation)
 
+        if (abs(self.angle) >= np.pi/6):
+            self.angle = np.pi/6
+
         return self.angle
