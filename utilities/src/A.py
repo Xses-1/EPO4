@@ -56,9 +56,9 @@ kittmodel.theta = Theta
 while(1):
     # Getting the PWMs to move the car to the correct direction
     F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
-    #pwmMotor    = pid.ForcetoPWM(F)
+    pwmMotor    = pid.ForcetoPWM(F)
     pwmSteering = pid.RadiansToPWM(phi)
-    pwmMotor    = 160 # Can be fixed for testing
+    # pwmMotor    = 160 # Can be fixed for testing
 
     # Get the time when the car started to move
     time_old = time.monotonic()
@@ -72,7 +72,7 @@ while(1):
 
     # Calcualting the current position of the car with the model
     run_time = time.monotonic() - time_old
-    position_Vector, Theta = kittmodel.update(phi, 4.06, run_time)
+    position_Vector, Theta = kittmodel.update(phi, F, run_time)
     cX = position_Vector[0][0]
     cY = position_Vector[1][0]
 

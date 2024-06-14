@@ -10,8 +10,8 @@ from module4 import KITTmodel
 from PID import PID
 import purepursuit
 
-positionx = 2.0
-positiony = 2.0
+positionx = -2.0
+positiony = -2.0
 
 waittime = 10
 movetime = 390
@@ -71,7 +71,7 @@ line3, = ax[1][0].plot(t, Thetas, lw=2, label = 'Thetas')
 line33, = ax[1][0].plot(t,(np.concatenate([[0.0] * waittime, [45.0] * movetime])), label = 'theta setpoint')
 ax[1][0].set_ylabel('Theta [deg]')
 ax[1][0].set_xlabel('time [s]')
-ax[1][0].set_ylim(-1,np.pi)
+ax[1][0].set_ylim(-4,4)
 ax[1][0].legend(loc = 'upper right')
 
 line4, = ax[1][1].plot(t, x, lw=2, label = 'x position')
