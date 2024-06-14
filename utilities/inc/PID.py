@@ -39,7 +39,6 @@ class PID:
             if abs(deltaTheta) > np.pi:
                 deltaTheta = (np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
             
-            print(deltaTheta)
             if abs(deltaTheta) > np.pi/2:
                 deltaP = -deltaP
                 deltaTheta = (np.sign(deltaTheta) * np.pi) + deltaTheta

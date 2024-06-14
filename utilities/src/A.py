@@ -34,7 +34,7 @@ if ((tX > size_of_the_field) or (tY > size_of_the_field)):
 
 # Checiking the os and connecting to the port
 if os.name == 'nt':
-    comPort = 'COM22'
+    comPort = 'COM5'
 else:
     comPort = '/dev/rfcomm0'
 

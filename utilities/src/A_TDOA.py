@@ -31,6 +31,12 @@ print("in following notation: \"X\\nY\", ex. \"0.69\\n4.20\"")
 tX = float(input())
 tY = float(input())
 
+# For testing the initail position can be typed in
+print("Type in the current position in meters and angle")
+cX = float(input())
+cY = float(input())
+Theta = np.pi/2*float(input())
+
 # Check if the target is valid
 if ((tX > size_of_the_field) or (tY > size_of_the_field)):
     print("Invalid target, BYE! 😠")
@@ -39,24 +45,24 @@ if ((tX > size_of_the_field) or (tY > size_of_the_field)):
 
 # Checiking the os and connecting to the port
 if os.name == 'nt':
-    comPort = 'COM22'
+    comPort = 'COM5'
 else:
     comPort = '/dev/rfcomm0'
 
 
 # Initializing the mics and refrence files
 mics = Audio()
-N = 44100 * 1
+Fs = 44100
+N = Fs * 1
 data = mics.sample(N)
 samples = mics.split_data(data)
-Fs = 44100
+
 
 
 # Initialize all of the objects
 kittmodel = KITTmodel()
 kitt = KITT(comPort)
 pid = PID()
-mics = Audio()
 T = TDOA()
 
 
@@ -70,29 +76,30 @@ x4 = wavaudioread(root_folder / "utilities/data/Reference4.wav", Fs)
 x5 = wavaudioread(root_folder / "utilities/data/Reference5.wav", Fs)
 
 
-# Checking the initial position (c for current)
-KITT.startBeacon()
-cX = T.localization(x1,x2,x3,x4,x5, y, Fs)[0]
-cY = T.localization(x1,x2,x3,x4,x5, y, Fs)[1]
-KITT.stopBeacon()
-
-# For testing the initail position can be typed in
-print("Type in the current position in meters and angle")
-cX = float(input())
-cY = float(input())
-Theta = np.pi/2*float(input())
-
 kittmodel.position_state_vector = np.array([[cX],[cY]])
 kittmodel.theta = Theta
+
+## Checking the initial position (c for current)
+#kitt.startBeacon()
+#time.sleep(0.5)
+#data = mics.sample(N)
+#samples = mics.split_data(data)
+#y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
+#pos = T.localization(x1,x2,x3,x4,x5, y, Fs)
+#cX = pos[0]
+#cY = pos[1]
+#kitt.stopBeacon()
+
+print(cX, cY)
 
 # The loop function:
 i = 0
 while(1):
     # Getting the PWMs to move the car to the correct direction
     F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
-    #pwmMotor    = pid.ForceToPWM(F)
+    pwmMotor    = pid.ForceToPWM(F)
     pwmSteering = pid.RadiansToPWM(phi)
-    pwmMotor    = 160 # Can be fixed for testing
+    #pwmMotor    = 160 # Can be fixed for testing
 
     # Get the time when the car started to move
     time_old = time.monotonic()
@@ -125,7 +132,7 @@ while(1):
 
 
     # Calibrate the current position any other time
-    if (i == 100):
+    if (i == 50):
         # Stop the car
         pwmSteering = 150
         pwmMotor    = 150
@@ -137,12 +144,18 @@ while(1):
 
         # Use the TDOA
         kitt.startBeacon()
-        cX = T.localization(x1,x2,x3,x4,x5, y, Fs)[0]
-        cY = T.localization(x1,x2,x3,x4,x5, y, Fs)[1]
+        time.sleep(0.5)
+        data = mics.sample(N)
+        samples = mics.split_data(data)
+        y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
+        pos = T.localization(x1,x2,x3,x4,x5, y, Fs)
+        cX = pos[0]
+        cY = pos[1]
+        print(f'TDOA POS{cX, cY}')
         kitt.stopBeacon()
 
         # Update the position in the simulation
-        KITTmodel.position_state_vector = np.array([[cX], [cY]])
+        kittmodel.position_state_vector = np.array([[cX], [cY]])
 
     
     # Check if the target was reached with some margin
@@ -158,8 +171,14 @@ while(1):
 
         # Check if you actually reached the target
         kitt.startBeacon()
-        cX = T.localization(x1,x2,x3,x4,x5, y, Fs)[0]
-        cY = T.localization(x1,x2,x3,x4,x5, y, Fs)[1]
+        time.sleep(0.5)
+        data = mics.sample(N)
+        samples = mics.split_data(data)
+        y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
+        pos = T.localization(x1,x2,x3,x4,x5, y, Fs)
+        cX = pos[0]
+        cY = pos[1]
+        print(f'TDOA POS{cX, cY}')
         kitt.stopBeacon()
 
         # Update the position in the simulation
