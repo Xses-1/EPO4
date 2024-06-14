@@ -6,19 +6,15 @@ import numpy as np
 
 sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from KITT import KITT
-#from Audio import Audio
 from module4 import KITTmodel
 from PID import PID
-from purepursuit import purePursuit
-# from tdoa import TDOA
-
 
 
 # Define static variables
 target_offset = 0.6          # The distance from the tarrget to still count success
 calibration_delay = 100     # The amount of loop iterations before the TDOA calibration
 size_of_the_field = 4.80     # It's a square
-run_time  = 0.00000000000000000000000000000000000000000000000000000019
+run_time  = 19e-127
 
 
 
@@ -46,13 +42,6 @@ else:
 kittmodel = KITTmodel()
 kitt = KITT(comPort)
 pid = PID()
-pps = purePursuit()
-
-
-# Checking the initial position (c for current)
-# KITT.startBeacon()
-# cX, cY = TDOA.TDOA()
-# KITT.stopBeacon()
 
 # For testing the initail position can be typed in
 print("Type in the current position in meters and angle")
@@ -64,22 +53,12 @@ kittmodel.position_state_vector = np.array([[cX],[cY]])
 kittmodel.theta = Theta
 
 # The loop function:
-i = 0
 while(1):
     # Getting the PWMs to move the car to the correct direction
     F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
     #pwmMotor    = pid.ForceToPWM(F)
     pwmSteering = pid.RadiansToPWM(phi)
     pwmMotor    = 160 # Can be fixed for testing
-
-    '''
-    # Getting the PWMs to move the car with the Pure Pursuit
-    F, _ = pid.Update(tX, tY, cX, cY, Theta, run_time)
-    phi = pps.purepursuit(cX, cY, tX, tY, Theta) 
-    # pwmMotor    = pid.forcePID(Theta, run_time, tX, tY, cX, cY)
-    pwmSteering = pid.RadiansToPWM(phi)
-    pwmMotor    = 160 # Can be fixed for testing
-    '''
 
     # Get the time when the car started to move
     time_old = time.monotonic()
@@ -100,38 +79,15 @@ while(1):
     '''
     print("Time: ")
     print(run_time)
-    '''
     print("CX, CY: ")
     print(cX, cY)
-    '''
     print("Phi, F: ")
     print(phi, F)
     print("PMWs: ")
     print(pwmSteering, pwmMotor)
-    '''
     print()
+    '''
 
-
-    # Calibrate the current position any other time
-    if (i == 9999999999999999999999999999):
-        # Stop the car
-        pwmSteering = 150
-        pwmMotor    = 150
-        kitt.set_speed(pwmMotor)
-        kitt.set_angle(pwmSteering)
-
-        # Wait utill it actually stops
-        time.sleep(1)
-
-        # Use the TDOA
-        kitt.startBeacon()
-        cX, cY = TDOA.TDOA()
-        kitt.stopBeacon()
-
-        # Update the position in the simulation
-        KITTmodel.position_state_vector = np.array([[cX], [cY]])
-
-    
     # Check if the target was reached with some margin
     if ((abs(tX - cX) <= target_offset) and (abs(tY - cY) <= target_offset)):
         # Stop the car
@@ -143,24 +99,13 @@ while(1):
         # Wait untill it actually stops
         time.sleep(1)
 
-        '''
-        # Check if you actually reached the target
-        kitt.startBeacon()
-        cX, cY = TDOA.TDOA()
-        kitt.stopBeacon()
-        '''
-
-        # Update the position in the simulation
-        kittmodel.position_state_vector = np.array([[cX], [cY]])
-
         # If it still equals then stop everything, if not then continue the loop
         if ((abs(tX - cX) <= target_offset) and (abs(tY - cY) <= target_offset)):
+            # Print the values that can be used to run the code again for challange B
+            print(cX, cY, Theta)
+
             kitt.serial.close()
             exit()
 
     # Log the report from the car
     kitt.log_status()
-
-    # Incremeant the loop counter
-    i = i + 1
-
