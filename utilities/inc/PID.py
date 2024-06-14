@@ -8,13 +8,13 @@ class PID:
         self.distIntegral = 0
         self.LastdistError = 0
 
-        self.maxForce = 7.16
-        self.maxAngle = 0.523599
+        self.maxForce = 8.91
+        self.maxAngle = 0.349066
         
-        self.ForceList  = [8.91,4.992,0,-1.47,-3.38,-7.16]
+        self.ForceList  = [8.91,4.992,1.04,0,-2.71,-6.24,-9.984]
         self.PWMList    = [165,160,156,150,145,140,135]
 
-        self.ForceKp = 1
+        self.ForceKp = 2
         self.ForceKi = 0
         self.ForceKd = 0
 
@@ -39,12 +39,11 @@ class PID:
             if abs(deltaTheta) > np.pi:
                 deltaTheta = (np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
             
-            print(deltaTheta)
             if abs(deltaTheta) > np.pi/2:
                 deltaP = -deltaP
                 deltaTheta = (np.sign(deltaTheta) * np.pi) + deltaTheta
 
-            print(f'deltaP = {deltaP}, deltaTheta = {deltaTheta}')
+            #print(f'deltaP = {deltaP}, deltaTheta = {deltaTheta}')
         else:
             return 0.0,0.0
         
@@ -64,7 +63,7 @@ class PID:
         if abs(Force) > self.maxForce:
             Force = np.sign(Force) * self.maxForce
 
-        print(f'Force : {Force}')
+        #print(f'Force : {Force}')
 
         return Force
     
@@ -107,6 +106,10 @@ class PID:
         return int(np.round(10/6 * Angle + 150, 0))
     
     def RadiansToPWM(self, Angle):
-        return int(np.round(300/np.pi * Angle + 150))
+        PWM1   = 100
+        PWM2   = 200
+        Phi1 = -self.maxAngle
+        Phi2 = self.maxAngle
+        return int(np.round(((PWM2 - PWM1)/(Phi2 - Phi1)) * (Angle - Phi1) + PWM1, 0))
     
     
