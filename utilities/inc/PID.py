@@ -93,9 +93,6 @@ class PID:
 
     def ForcetoPWM(self, Force):
         for i in range(1,len(self.ForceList)):
-            print(self.ForceList[i-1], Force, self.ForceList[i])
-
-            print(self.ForceList[i-1] <= Force, Force >= self.ForceList[i])
             if self.ForceList[i-1] >= Force >= self.ForceList[i]:
                 PWM1 = self.PWMList[i-1]
                 PWM2 = self.PWMList[i]
