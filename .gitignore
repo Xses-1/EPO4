@@ -3,6 +3,5 @@
 *.out
 *.pkl
 *.csv
-utilities/inc/test.txt
 *.txt
 .vscode

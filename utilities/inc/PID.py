@@ -11,7 +11,7 @@ class PID:
         self.maxForce = 7.16
         self.maxAngle = 0.523599
         
-        self.ForceList  = [7.16,4.06,0.49,0,-1,47,-3.38,-7.16]
+        self.ForceList  = [8.91,4.992,0,-1,47,-3.38,-7.16]
         self.PWMList    = [165,160,156,150,145,140,135]
 
         self.ForceKp = 1

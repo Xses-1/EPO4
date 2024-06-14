@@ -11,7 +11,6 @@ from KITT import KITT
 from Audio import Audio
 from module4 import KITTmodel
 from PID import PID
-from purepursuit import purePursuit
 from var_ref_tdoa import TDOA
 
 
@@ -57,7 +56,6 @@ Fs = 44100
 kittmodel = KITTmodel()
 kitt = KITT(comPort)
 pid = PID()
-pps = purePursuit()
 mics = Audio()
 T = TDOA()
 
@@ -95,15 +93,6 @@ while(1):
     #pwmMotor    = pid.ForceToPWM(F)
     pwmSteering = pid.RadiansToPWM(phi)
     pwmMotor    = 160 # Can be fixed for testing
-
-    '''
-    # Getting the PWMs to move the car with the Pure Pursuit
-    F, _ = pid.Update(tX, tY, cX, cY, Theta, run_time)
-    phi = pps.purepursuit(cX, cY, tX, tY, Theta) 
-    # pwmMotor    = pid.forcePID(Theta, run_time, tX, tY, cX, cY)
-    pwmSteering = pid.RadiansToPWM(phi)
-    pwmMotor    = 160 # Can be fixed for testing
-    '''
 
     # Get the time when the car started to move
     time_old = time.monotonic()
@@ -185,8 +174,7 @@ while(1):
             exit()
 
     # Log the report from the car
-    kitt.log_status()
+    # kitt.log_status()
 
     # Incremeant the loop counter
     i = i + 1
-
