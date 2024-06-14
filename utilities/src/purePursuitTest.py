@@ -10,12 +10,12 @@ from module4 import KITTmodel
 from PID import PID
 import purepursuit
 
-positionx = 3.0
-positiony = 1.0
+positionx = 2.0
+positiony = -3.0
 
 waittime = 10
 movetime = 390
-t = np.linspace(0,20,400)
+t = np.linspace(0,20, 400)
 Setpointsx = np.concatenate([np.zeros(waittime), [positionx] * movetime])
 Setpointsy = np.concatenate([np.zeros(waittime), [positiony] * movetime])
 
@@ -39,7 +39,6 @@ for i in range(1,len(t)):
     dt = t[i] - t[i-1]
 
     position_Vector, Theta = KITT.update(phi,F,dt)
-    print(position_Vector)
     x.append(position_Vector[0][0])
     y.append(position_Vector[1][0])
     Thetas.append(Theta)
@@ -57,8 +56,8 @@ line1, = ax[0][0].plot(x, y, lw=2, label = 'car position')
 line11, = ax[0][0].plot(Setpointsx, Setpointsy, label = 'car setpoint')
 ax[0][0].set_xlabel('X [m]')
 ax[0][0].set_ylabel('Y [m]')
-ax[0][0].set_ylim(-2,5)
-ax[0][0].set_xlim(-2,5)
+ax[0][0].set_ylim(-5,5)
+ax[0][0].set_xlim(-5,5)
 ax[0][0].legend(loc = 'upper right')
 
 line2, = ax[0][1].plot(t, Phis, lw=2, label = 'wheel Angle')

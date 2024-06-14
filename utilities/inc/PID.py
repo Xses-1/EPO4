@@ -14,7 +14,7 @@ class PID:
         self.ForceList  = [7.16,4.06,0.49,0,-1,47,-3.38,-7.16]
         self.PWMList    = [165,160,156,150,145,140,135]
 
-        self.ForceKp = 2
+        self.ForceKp = 1
         self.ForceKi = 0
         self.ForceKd = 0
 
@@ -32,24 +32,17 @@ class PID:
         y = setpointy - curry
         deltaP = np.sqrt((x)**2 + (y)**2)
 
-        if deltaP != 0:
+        if deltaP > 0.05:
             angle = np.arctan2(y,x)                                 
-            deltaTheta1 = angle - currentAngle
-            deltaTheta2 = angle + np.pi - currentAngle
-            print(angle)
+            deltaTheta = angle - currentAngle
 
-
-            #if deltaTheta1 >=  np.pi:
-            #    deltaTheta1 -= 2 * np.pi
-            #if deltaTheta2 >=  np.pi:
-            #    deltaTheta2 -= 2 * np.pi
+            if abs(deltaTheta) > np.pi:
+                deltaTheta = (np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
             
-            
-            if deltaTheta1 <= deltaTheta2:
-                deltaTheta = deltaTheta1
-            else:
-                deltaTheta = deltaTheta2
+            print(deltaTheta)
+            if abs(deltaTheta) > np.pi/2:
                 deltaP = -deltaP
+                deltaTheta = (np.sign(deltaTheta) * np.pi) + deltaTheta
 
             print(f'deltaP = {deltaP}, deltaTheta = {deltaTheta}')
         else:
@@ -67,10 +60,11 @@ class PID:
 
         #print(deltaP, self.distIntegral, distDiff)
         Force = (self.ForceKp * deltaP) + (self.ForceKi * self.distIntegral) + (self.ForceKd * distDiff)
-        #print(Force)
 
         if abs(Force) > self.maxForce:
             Force = np.sign(Force) * self.maxForce
+
+        print(f'Force : {Force}')
 
         return Force
     
