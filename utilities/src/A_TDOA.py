@@ -125,7 +125,7 @@ while(1):
 
 
     # Calibrate the current position any other time
-    if (i == 9999999999999999999999999999):
+    if (i == 100):
         # Stop the car
         pwmSteering = 150
         pwmMotor    = 150
