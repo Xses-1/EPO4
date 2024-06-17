@@ -1,12 +1,15 @@
+import os
+import sys
+sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from module4 import KITTmodel
-from EPO4.Inc.PID import PID
+from PID import PID
 import numpy as np
 import matplotlib.pyplot as plt
 
 from matplotlib.widgets import Button, Slider
 
 positionx = 0.0
-positiony = 2.0
+positiony = 0.0
 currentAngle = 90.0
 
 t = np.linspace(0,40,2000)
@@ -28,7 +31,6 @@ def TestPIDForce(kp,ki,kd):
         z.append(z[-1] + (v * dt))
         
         deltaP, deltaTheta = Pid.CalculateErrors(positionx, Setpointsy[i], positionx, z[-1], currentAngle)
-
         F = Pid.calculateForce(deltaP, dt)
 
     z = np.array(z)

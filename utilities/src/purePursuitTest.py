@@ -10,8 +10,8 @@ from module4 import KITTmodel
 from PID import PID
 import purepursuit
 
-positionx = -2.0
-positiony = -2.0
+positionx = 2.0
+positiony = 2.0
 
 waittime = 10
 movetime = 390
@@ -45,8 +45,6 @@ for i in range(1,len(t)):
 
     F, phi = Pid.Update(Setpointsx[i], Setpointsy[i], x[-1], y[-1], Theta, dt)
 
-    #print(Pid.angle , '  ', phi)
-
     Phis.append(phi)
 
 fig, ax = plt.subplots(2,2)
@@ -67,16 +65,16 @@ ax[0][1].set_xlabel('time [s]')
 ax[0][1].legend()
 
 
-line3, = ax[1][0].plot(t, Thetas, lw=2, label = 'Thetas')
-line33, = ax[1][0].plot(t,(np.concatenate([[0.0] * waittime, [45.0] * movetime])), label = 'theta setpoint')
-ax[1][0].set_ylabel('Theta [deg]')
+line3, = ax[1][0].plot(t, x, lw=2, label = 'x position')
+line33, = ax[1][0].plot(t, Setpointsx , label = 'x setpoint')
+ax[1][0].set_ylabel('x [m]')
 ax[1][0].set_xlabel('time [s]')
 ax[1][0].set_ylim(-4,4)
 ax[1][0].legend(loc = 'upper right')
 
-line4, = ax[1][1].plot(t, x, lw=2, label = 'x position')
-line44, = ax[1][1].plot(t,Setpointsx, label = 'x setpoint')
-ax[1][1].set_ylabel('x position [m]')
+line4, = ax[1][1].plot(t, y, lw=2, label = 'y position')
+line44, = ax[1][1].plot(t,Setpointsy, label = 'y setpoint')
+ax[1][1].set_ylabel('y position [m]')
 ax[1][1].set_xlabel('time [s]')
 ax[1][1].set_ylim(-2,2)
 ax[1][1].legend(loc = 'upper right')
