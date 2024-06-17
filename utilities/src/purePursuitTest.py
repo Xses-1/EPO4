@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
 from matplotlib.widgets import Button, Slider
+import time
 
 import os
 import sys
@@ -9,6 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(sys.path[0]), 'inc'))
 from module4 import KITTmodel
 from PID import PID
 import purepursuit
+from GUI import GUI
 
 positionx = 2.0
 positiony = 2.0
@@ -32,6 +33,8 @@ y = [0.0]
 Phis = [0]
 Thetas = [np.pi/2]
 
+G = GUI(x[-1],y[-1], Thetas[-1], 0,0)
+
 with open('test.txt', 'w') as f:
     f.write(' empty run')
 
@@ -46,6 +49,8 @@ for i in range(1,len(t)):
     F, phi = Pid.Update(Setpointsx[i], Setpointsy[i], x[-1], y[-1], Theta, dt)
 
     Phis.append(phi)
+
+    G.update(x[-1],y[-1], Theta, Setpointsx[i], Setpointsy[i])
 
 fig, ax = plt.subplots(2,2)
 fig.subplots_adjust(bottom=0.2, left = 0.1, top = 0.98, right = 0.99)
@@ -80,3 +85,4 @@ ax[1][1].set_ylim(-2,2)
 ax[1][1].legend(loc = 'upper right')
 
 plt.show()
+input()

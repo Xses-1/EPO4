@@ -17,13 +17,12 @@ class PID:
         self.PWMList    = [165,160,156,150,150,150,146,140,135]
 
         self.ForceKp = 2
-        self.ForceKi = 0.0
-        self.ForceKd = 0.0
+        self.ForceKi = 0.04
+        self.ForceKd = 1.0
 
         self.AngleKp = 0.8
-        self.AngleKi = 0.0
-        self.AngleKd = 0.0
-        
+        self.AngleKi = 0.1
+        self.AngleKd = 0.2        
         
         ## test values
         self.angle = 0
@@ -59,9 +58,10 @@ class PID:
         return deltaP, deltaTheta
     
     def calculateForce(self, deltaP, deltaT):
-        self.distIntegral += deltaP * deltaT
+        self.distIntegral += (self.LastdistError + deltaP)/2 * deltaT
         distDiff = (deltaP - self.LastdistError ) / deltaT
-        self.lastdistError = deltaP
+        self.LastdistError = deltaP
+        print(self.distIntegral)
 
         Force = (self.ForceKp * deltaP) + (self.ForceKi * self.distIntegral) + (self.ForceKd * distDiff)
 
@@ -77,10 +77,9 @@ class PID:
         return Force
     
     def calculateAngle(self, deltaTheta, deltaT):
-        self.angleIntegral += deltaTheta * deltaT
-        angleDiff = (deltaTheta - self.LastAngleError)
+        self.angleIntegral += (self.LastAngleError + deltaTheta)/2 * deltaT
+        angleDiff = (deltaTheta - self.LastAngleError)/deltaT
         self.LastAngleError = deltaTheta
-
 
         Angle = (self.AngleKp * deltaTheta) + (self.AngleKi * self.angleIntegral) + (self.AngleKd * angleDiff)
         
