@@ -8,21 +8,21 @@ class PID:
         self.distIntegral = 0
         self.LastdistError = 0
 
-        self.minForce = 1.03
+        self.minForce = 1.04
         self.maxForce = 8.91
         self.minAngle = 0.0872665
         self.maxAngle = 0.349066
         
-        self.ForceList  = [8.91,4.992,1.04,0,0,0,-2.71,-6.24,-9.984]
-        self.PWMList    = [165,160,156,155,150,145,146,140,135]
+        self.ForceList  = [8.91,4.992,1.04,1.03,0,-2.70,-2.71,-6.24,-9.984]
+        self.PWMList    = [165,160,156,150,150,150,146,140,135]
 
-        self.ForceKp = 0.8
-        self.ForceKi = 0
-        self.ForceKd = 0
+        self.ForceKp = 2
+        self.ForceKi = 0.0
+        self.ForceKd = 0.0
 
-        self.AngleKp = 1
-        self.AngleKi = 0
-        self.AngleKd = 0
+        self.AngleKp = 0.8
+        self.AngleKi = 0.0
+        self.AngleKd = 0.0
         
         
         ## test values
@@ -30,71 +30,64 @@ class PID:
 
 
     def CalculateErrors(self, setpointx, setpointy, currx, curry, currentAngle):
+        ## (x,y) is Vector pointing from current position to setpoint
         x = setpointx - currx
         y = setpointy - curry
         deltaP = np.sqrt((x)**2 + (y)**2)
 
-        if deltaP > 0.05:
-            angle = np.arctan2(y,x)        
-            print(angle)                         
-            deltaTheta = angle - currentAngle
+        ## Prevent rounding errors 
+        if deltaP < 0.1:
+            deltaP = 0.0
 
-            print(f'delta:{deltaTheta}')
-            if abs(deltaTheta) > np.pi:
-                deltaTheta = -(np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
+        ## Angle of pointing vector
+        angle = np.arctan2(y,x)        
+        ## DeltaTheta is the angle between the direction vector and the pointing vector                   
+        deltaTheta = angle - currentAngle
+
+        ## Limit deltaTheta between -pi and pi
+        while not ( -np.pi <= deltaTheta <= np.pi):
+            deltaTheta = -(np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
+
+        if abs(deltaTheta) > np.pi/2:
+            deltaP = -deltaP
+            deltaTheta = (np.sign(deltaTheta) * np.pi) + deltaTheta
             
-            if abs(deltaTheta) > np.pi/2:
-                deltaP = -deltaP
-                deltaTheta = (np.sign(deltaTheta) * np.pi) + deltaTheta
+        ## Limit deltaTheta between -pi and pi
+        while not ( -np.pi <= deltaTheta <= np.pi):
+            deltaTheta = -(np.sign(deltaTheta) * 2 * np.pi) + deltaTheta
 
-            #print(f'deltaP = {deltaP}, deltaTheta = {deltaTheta}')
-        else:
-            return 0.0,0.0
-        
         return deltaP, deltaTheta
     
     def calculateForce(self, deltaP, deltaT):
-        ## Ku = 55529.223
-
-        self.distIntegral += deltaP/deltaT
-        distDiff = (self.LastdistError - deltaP) / deltaT
-
+        self.distIntegral += deltaP * deltaT
+        distDiff = (deltaP - self.LastdistError ) / deltaT
         self.lastdistError = deltaP
 
-        #print(deltaP, self.distIntegral, distDiff)
         Force = (self.ForceKp * deltaP) + (self.ForceKi * self.distIntegral) + (self.ForceKd * distDiff)
 
         if abs(Force) > self.maxForce:
             Force = np.sign(Force) * self.maxForce
 
-<<<<<<< HEAD
-=======
-        if abs(Force) < 0.01:
-            Force = 0
-        elif abs(Force) > self.maxForce:
-            Force = np.sign(Force) * self.maxForce
-        elif abs(Force) < self.minForce:
-            Force = np.sign(Force) * self.minForce
-
->>>>>>> origin/module4
-        #print(f'Force : {Force}')
+        if abs(Force) != 0.0:
+            if abs(Force) > self.maxForce:
+                Force = np.sign(Force) * self.maxForce
+            elif abs(Force) < self.minForce:
+                Force = 0.0
 
         return Force
     
     def calculateAngle(self, deltaTheta, deltaT):
-        self.angleIntegral += deltaTheta
-        angleDiff = (self.LastAngleError - deltaTheta) / deltaT
-
+        self.angleIntegral += deltaTheta * deltaT
+        angleDiff = (deltaTheta - self.LastAngleError)
         self.LastAngleError = deltaTheta
 
-        Angle = (self.AngleKp * deltaTheta) + (self.AngleKi * self.angleIntegral) + (self.AngleKd * angleDiff)
 
-        if abs(Angle) < 0.0174533:
+        Angle = (self.AngleKp * deltaTheta) + (self.AngleKi * self.angleIntegral) + (self.AngleKd * angleDiff)
+        
+        if abs(Angle) < self.minAngle:
             Angle = 0
         elif abs(Angle) > self.maxAngle:
             Angle = np.sign(Angle) * self.maxAngle
-        elif abs(Angle) < self.minAngle:
-            Angle = np.sign(Angle) * self.minAngle
 
         return Angle
     
