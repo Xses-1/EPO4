@@ -13,7 +13,7 @@ class KITTmodel():
 
     def velocity_state(self, F_m, dt):
         #b = 4.15
-        b = 4.15
+        b = 4.16
         m = 5.6
 
         self.accelleration =  (F_m - (b * self.velocity))/m

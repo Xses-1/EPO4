@@ -3,7 +3,8 @@ import numpy as np
 import matplotlib
 
 class GUI:
-    def __init__(self, Startx, Starty, startTheta, setpointx, setpointy):
+    def __init__(self, Startx, Starty, startTheta, setpointx, setpointy, sleeptime = 0.1):
+        self.sleeptime = sleeptime
         matplotlib.use('TkAgg')
         plt.ion()
         plt.xlim(-0.5,5)
@@ -34,4 +35,4 @@ class GUI:
         self.setpoint = plt.scatter(setpointx, setpointy, color = 'red')
 
         plt.draw()
-        plt.pause(0.1)
+        plt.pause(self.sleeptime)

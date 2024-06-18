@@ -12,14 +12,16 @@ from Audio import Audio
 from module4 import KITTmodel
 from PID import PID
 from var_ref_tdoa import TDOA
+from GUI import GUI
 
 
 
 # Define static variables
-target_offset = 0.6         # The distance from the tarrget to still count success
+target_offset = 0.3      # The distance from the tarrget to still count success
 calibration_delay = 100     # The amount of loop iterations before the TDOA calibration
 size_of_the_field = 4.60    # It's a square
 run_time  = 19e-127         # 0 but not 0 so the divide by 0 does not break
+sleeptime = 0.1
 
 
 
@@ -32,7 +34,7 @@ tX = float(input())
 tY = float(input())
 
 # For testing the initail position can be typed in
-print("Type in the current position in meters and angle")
+print("Type in the current position in meters and angle in Radians / (np.pi/2)")
 cX = float(input())
 cY = float(input())
 Theta = np.pi/2*float(input())
@@ -79,64 +81,72 @@ x5 = wavaudioread(root_folder / "utilities/data/Reference5.wav", Fs)
 kittmodel.position_state_vector = np.array([[cX],[cY]])
 kittmodel.theta = Theta
 
-## Checking the initial position (c for current)
-#kitt.startBeacon()
-#time.sleep(0.5)
-#data = mics.sample(N)
-#samples = mics.split_data(data)
-#y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
-#pos = T.localization(x1,x2,x3,x4,x5, y, Fs)
-#cX = pos[0]
-#cY = pos[1]
-#kitt.stopBeacon()
+# Checking the initial position (c for current)
+kitt.startBeacon()
+time.sleep(0.5)
+data = mics.sample(N)
+samples = mics.split_data(data)
+y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
+pos = T.localization(x1,x2,x3,x4,x5, y, Fs)
+print(pos)
+kitt.stopBeacon()
 
 print(cX, cY)
+
+G = GUI(cX, cY,Theta, tX, tY, sleeptime = sleeptime)
 
 # The loop function:
 i = 0
 while(1):
-    # Getting the PWMs to move the car to the correct direction
-    F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
-    pwmMotor    = pid.ForcetoPWM(F)
-    pwmSteering = pid.RadiansToPWM(phi)
-    #pwmMotor    = 160 # Can be fixed for testing
 
-    # Get the time when the car started to move
-    time_old = time.monotonic()
+    if( i < 15):
+        # Getting the PWMs to move the car to the correct direction
+        F, phi = pid.Update(tX, tY, cX, cY, Theta, run_time)
+        print(f'F: {F}')
+        pwmMotor    = pid.ForcetoPWM(F)
+        pwmSteering = pid.RadiansToPWM(phi)
 
-    # Transmitting the PWMs to the car and making it move
-    kitt.set_speed(pwmMotor)
-    kitt.set_angle(pwmSteering)
+        #pwmMotor    = 160 # Can be fixed for testing
+        #F = 4.992
 
-    # Let the car move for some time
-    time.sleep(0.1)
+        # Get the time when the car started to move
+        time_old = time.monotonic()
 
-    # Calcualting the current position of the car with the model
-    run_time = time.monotonic() - time_old
-    position_Vector, Theta = kittmodel.update(phi, 4.06, run_time)
-    print(Theta)
-    cX = position_Vector[0][0]
-    cY = position_Vector[1][0]
+        # Transmitting the PWMs to the car and making it move
+        kitt.set_speed(pwmMotor)
+        kitt.set_angle(pwmSteering)
 
-    # Testing and troubleshooting
-    '''
-    print("Time: ")
-    print(run_time)
-    print("CX, CY: ")
-    print(cX, cY)
-    print("Phi, F: ")
-    print(phi, F)
-    '''
-    print("PMWs: ")
-    print(pwmSteering, pwmMotor)
-    print()
+        #GUI update, aslo includes the sleep for movement
+        G.update(cX, cY, Theta, tX, tY)
+        #time.sleep(0.1)
 
+        # Calcualting the current position of the car with the model
+        run_time = time.monotonic() - time_old
+        position_Vector, Theta = kittmodel.update(phi, 4.06, run_time)
+        cX = position_Vector[0][0]
+        cY = position_Vector[1][0]
 
+        # Testing and troubleshooting
+        '''
+        print("Time: ")
+        print(run_time)
+        print("CX, CY: ")
+        print(cX, cY)
+        print("Phi, F: ")
+        print(phi, F)
+        '''
+        print("PMWs: ")
+        print(pwmSteering, pwmMotor)
+        print()
+
+    
+    Treshold = 20
     # Calibrate the current position any other time
-    if (i == 30):
+    if (i == Treshold):
         # Stop the car
         #pwmSteering = 150
         pwmMotor    = 150
+        F = 0
         kitt.set_speed(pwmMotor)
         #kitt.set_angle(pwmSteering)
 
@@ -155,8 +165,13 @@ while(1):
         print(f'TDOA POS{cX, cY}')
         kitt.stopBeacon()
 
-        # Update the position in the simulation
-        kittmodel.position_state_vector = np.array([[cX], [cY]])
+        # Update the position in the simulation and restart the models since the car waited to stop
+        #pid = PID()
+        kittmodel = KITTmodel()
+        kittmodel.position_state_vector = np.array([[cX],[cY]])
+        kittmodel.theta = Theta
+
+        i -= Treshold
 
     
     # Check if the target was reached with some margin
@@ -164,6 +179,7 @@ while(1):
         # Stop the car
         pwmSteering = 150
         pwmMotor    = 150
+        F = 0
         kitt.set_speed(pwmMotor)
         kitt.set_angle(pwmSteering)
 
@@ -197,4 +213,6 @@ while(1):
     # kitt.log_status()
 
     # Incremeant the loop counter
+
     i = i + 1
+    
