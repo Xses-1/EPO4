@@ -19,7 +19,7 @@ class GUI:
         self.setpoint = plt.scatter(setpointx, setpointy, color = 'red')
         plt.draw()
 
-        plt.pause(2)
+        plt.pause(0.5)
 
     def update(self, carx, cary, carTheta, setpointx, setpointy):
         plt.clf()
