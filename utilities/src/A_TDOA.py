@@ -19,7 +19,10 @@ def Challenge_A(cX, cY, Theta, tX, tY, target_offset, calibration_delay, sleepti
     from var_ref_tdoa import TDOA
     from GUI import GUI
 
+
+    ## Static Init Variables
     run_time  = 19e-127         # 0 but not 0 so the divide by 0 does not break
+    size_of_the_field = 4.60    # It's a square
 
     #Check if the target is valid
     if ((tX > size_of_the_field) or (tY > size_of_the_field)):
@@ -140,9 +143,20 @@ def Challenge_A(cX, cY, Theta, tX, tY, target_offset, calibration_delay, sleepti
             samples = mics.split_data(data)
             y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
             pos = T.localization(x1,x2,x3,x4,x5, y, Fs)
+
+            '''
+            if not (0 <= pos[0] <= size_of_the_field) or not (0 <= pos[1] <= size_of_the_field):
+                cX = cX
+                cY = cY
+            else:
+                cX = pos[0]
+                cY = pos[1]
+                print(f'TDOA POS{cX, cY}')
+            '''
+
             cX = pos[0]
             cY = pos[1]
-            print(f'TDOA POS{cX, cY}')
+            
             kitt.stopBeacon()
 
             # Update the position in the simulation and restart the models since the car waited to stop
@@ -173,6 +187,17 @@ def Challenge_A(cX, cY, Theta, tX, tY, target_offset, calibration_delay, sleepti
             samples = mics.split_data(data)
             y = T.tdoa_input(samples[0], samples[1], samples[2], samples[3], samples[4])
             pos = T.localization(x1,x2,x3,x4,x5, y, Fs)
+
+            '''
+            if not (0 <= pos[0] <= size_of_the_field) or not (0 <= pos[1] <= size_of_the_field):
+                cX = cX
+                cY = cY
+            else:
+                cX = pos[0]
+                cY = pos[1]
+                print(f'TDOA POS{cX, cY}')
+            '''
+
             cX = pos[0]
             cY = pos[1]
             print(f'TDOA POS{cX, cY}')
@@ -201,7 +226,7 @@ def Challenge_A(cX, cY, Theta, tX, tY, target_offset, calibration_delay, sleepti
 
 if __name__ == '__main__':
     # Define static variables
-    target_offset = 0.3      # The distance from the tarrget to still count success
+    target_offset = 0.2      # The distance from the tarrget to still count success
     calibration_delay = 15     # The amount of loop iterations before the TDOA calibration
     size_of_the_field = 4.60    # It's a square
     sleeptime = 0.1

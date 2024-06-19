@@ -16,6 +16,8 @@ class KITTmodel():
         b = 4.16
         m = 5.6
 
+        print(f'F_m: {F_m}')
+
         self.accelleration =  (F_m - (b * self.velocity))/m
         self.velocity += self.accelleration * dt
 

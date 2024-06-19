@@ -16,7 +16,7 @@ def locationToIndex(locX, locY):
         locY = 0
 
     indX = int(np.round(locX * 10))
-    indY = int(np.round(-100*(locY - 4.6)))
+    indY = int(np.round(locY * 10))
 
     return indX, indY
 
@@ -37,7 +37,7 @@ def indexToLocations(indX, indY):
         indX = 0
 
     locX = int(np.round(indX / 10))
-    locY = int(np.round(-100*(indY - 4.6)))
+    locY = int(np.round(indX / 10))
 
     return locX, locY
 

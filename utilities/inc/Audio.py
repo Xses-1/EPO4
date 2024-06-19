@@ -36,14 +36,12 @@ class Audio:
         j = []
         for i in range(self.handle.get_device_count()):
             devive_info = self.handle.get_device_info_by_index(i)
-            print(devive_info.device['name'])
             if "AudioBox 1818" in devive_info['name'] and "Microfoon" in devive_info['name']:
                 j.append(i)
 
         if len(j) == 0:
             print("AudioBox 1818 not found, please try again")
             sys.exit(-1)
-        print(j)
 
         return j
     
