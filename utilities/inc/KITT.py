@@ -16,8 +16,6 @@ class KITT:
         self.EstopF = False
         self.BeaconFlag = False
 
-        # Those are the extracted data from a report from KITT
-        # I am casting to enforce a data type because f*** python philosophy
         self.beacon = False
         self.c = int(0)
         self.f_c = int(0)
@@ -25,12 +23,8 @@ class KITT:
         self.c_r = int(0)
         self.dir = int(0)
         self.mot = int(0)
-        self.time_old = time.monotonic()
-        self.time_new = time.monotonic() 
         self.l = int(0)
-        self.l_old = int(0)
         self.r = int(0)
-        self.r_old = int(0)
         self.batt = float(0)
 
         self.speed = int(150)
@@ -59,8 +53,6 @@ class KITT:
             raise Exception
         
         self.setBeacon(carrier_freq = 5000, bit_frequency = 5000, repition_count = 2500, code = 0xB00B1E50)
-            
-        # state variables such as speed, angle are defined here
 
     def send_command(self, command):
         self.serial.write(command.encode())
@@ -126,7 +118,7 @@ class KITT:
 
     def log_status(self):
         # This routine splits the string and puts it
-        # into voariables that can be then logged
+        # into variables that can be then logged
         string = str(self.sitrep())
 
         i = 0
@@ -157,13 +149,9 @@ class KITT:
                 self.mot = int((string[i+3:i+9].split('\\'))[0])
             
             if string[i] == 'L' and string[i-1] == ' ' and string[i-2] == '.':
-                self.l_old = self.l
-                self.time_old = self.time_new
                 self.l = int((string[i+2:i+9].split(' '))[0])
-                self.time_new = time.monotonic() 
 
-            if string[i] == ' ' and string[i-1] == 'R' and string[i-2] == ' ': ## no time here cause it would interfere and the milisecond difference will be fine
-                self.r_old = self.r
+            if string[i] == ' ' and string[i-1] == 'R' and string[i-2] == ' ': 
                 self.r = int((string[i+1:i+9].split('\\'))[0])
             
             if string[i] == 't' and string[i-1] == 't' and string[i-2] == 'a':
