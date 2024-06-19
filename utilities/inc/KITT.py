@@ -69,7 +69,7 @@ class KITT:
         self.set_speed(150)
         self.set_angle(150)
 
-    def setBeacon(self, carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xDEADBEEF):
+    def setBeacon(self, carrier_freq = 1000, bit_frequency = 5000, repition_count = 2500, code = 0xEB79D549):
         carrier_freq = carrier_freq.to_bytes(2, byteorder= 'big')
         self.serial.write( b'F' + carrier_freq + b'\n')
         bit_frequency = bit_frequency.to_bytes(2, byteorder= 'big')
