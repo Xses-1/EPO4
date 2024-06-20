@@ -9,8 +9,8 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Button, Slider
 
 positionx = 0.0
-positiony = 0.0
-currentAngle = 90.0
+positiony = 1.0
+currentAngle = np.pi/2
 
 t = np.linspace(0,40,2000)
 Setpointsy = np.concatenate([np.zeros(100), [positiony] * 1900])
@@ -30,7 +30,7 @@ def TestPIDForce(kp,ki,kd):
         v = KITT.velocity_state(F, dt)
         z.append(z[-1] + (v * dt))
         
-        deltaP, deltaTheta = Pid.CalculateErrors(positionx, Setpointsy[i], positionx, z[-1], currentAngle)
+        deltaP, deltaTheta = Pid.CalculateErrors(0.0, Setpointsy[i], positionx, z[-1], currentAngle)
         F = Pid.calculateForce(deltaP, dt)
 
     z = np.array(z)
@@ -60,7 +60,7 @@ Kp_slider = Slider(
     ax=axKp,
     label='Kp',
     valmin=0,
-    valmax=30,
+    valmax=2,
     valinit=init_kp,
 )
 
