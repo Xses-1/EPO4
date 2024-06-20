@@ -16,7 +16,7 @@ class GUI:
         dx = np.cos(startTheta) * 0.2
         dy = np.sin(startTheta) * 0.2
         self.CarVector = plt.arrow(Startx, Starty, dx, dy, head_width = 0.1,
-                                                            width = 0.05,
+                                                            width = 0.02,
                                                             ec ='green')
 
         self.setpoint = plt.scatter(setpointx, setpointy, color = 'red')
